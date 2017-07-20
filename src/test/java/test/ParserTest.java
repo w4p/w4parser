@@ -32,6 +32,9 @@ public class ParserTest {
         assertEquals(model.getLinks().get(3).getText(), "A link 4");
         assertEquals(model.getLinks().get(4).getText(), "A link 5");
 
+        assertEquals(model.getNotfoundTitle(), null);
+        assertEquals(model.getNotfoundReview(), null);
+
 
         LOG.info("Result: {}", model);
 

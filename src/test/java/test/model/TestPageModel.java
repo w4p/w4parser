@@ -22,11 +22,17 @@ public class TestPageModel {
     @W4Xpath(path = "//h1:eq(1)/@class", defaultValue = "default-class")
     private String defaultTitleClass;
 
+    @W4Xpath(path = "//h2:eq(1)")
+    private String notfoundTitle;
+
     @W4Xpath(path = "//a", maxCount = 5)
     private List<TestLink> links;
 
     @W4Xpath(path = "/body//div[class='review']")
     private TestReview review;
+
+    @W4Xpath(path = "/body//div[class='review-notfound']")
+    private TestReview notfoundReview;
 
     @Override
     public String toString() {
