@@ -57,6 +57,15 @@ public class TypeAdapters {
         typeTokenCache.put(BigInteger.class, data -> new BigInteger(data));
         typeTokenCache.put(Enum.class, data -> new BigInteger(data));
 
+        typeTokenCache.put(int.class, data -> new Integer(data).intValue());
+        typeTokenCache.put(byte.class, data -> new Byte(data).byteValue());
+        typeTokenCache.put(short.class, data -> new Short(data).shortValue());
+        typeTokenCache.put(long.class, data -> new Long(data).longValue());
+        typeTokenCache.put(float.class, data -> new Float(data).floatValue());
+        typeTokenCache.put(double.class, data -> new Double(data).doubleValue());
+        typeTokenCache.put(boolean.class, data -> new Boolean(data).booleanValue());
+        typeTokenCache.put(char.class, data -> data.charAt(0));
+
     }
 
     public static boolean isContainType(Class clazz) {

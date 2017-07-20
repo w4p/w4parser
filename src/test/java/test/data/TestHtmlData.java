@@ -12,6 +12,10 @@ public class TestHtmlData {
                             "<h3>Author</h3>" +
                             "<div class=\"comment\">Comment text</div>" +
                             "<div class=\"comment\">Another Comment text</div>" +
+                            "<span class=\"rating\">4</span>" +
+                            "<span class=\"boolean\">true</span>" +
+                            "<span class=\"float\">4s.007</span>" +
+                            "<span class=\"float floatValValid\">4.007</span>" +
                             "<a href=\"http://www.google.com\">A link 1</a>" +
                             "<a href=\"http://www.google.com2\">A link 2</a>" +
                             "<a href=\"http://www.google.com3\">A link 3</a>" +

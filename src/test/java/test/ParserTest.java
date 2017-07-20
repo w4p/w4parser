@@ -35,6 +35,11 @@ public class ParserTest {
         assertEquals(model.getNotfoundTitle(), null);
         assertEquals(model.getNotfoundReview(), null);
 
+        assertEquals(model.getReview().isEnabled(), true);
+        assertEquals(model.getReview().getRating(), 4);
+        assertEquals(model.getReview().getFloatVal(), 0.0f, 0f);
+        assertEquals(model.getReview().getFloatValValid(), 4.007f, 0f);
+
 
         LOG.info("Result: {}", model);
 

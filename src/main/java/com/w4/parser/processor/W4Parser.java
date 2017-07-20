@@ -91,7 +91,10 @@ public class W4Parser {
 //                                field.set(model, getCollection(elements, w4Xpath, w4JPath, field.getType()));
                             } else {
                                 //bindData
-                                field.set(model, getData(elements.first(), w4JPath, field.getType()));
+                                Object val = getData(elements.first(), w4JPath, field.getType());
+                                if (val != null) {
+                                    field.set(model, val);
+                                }
                             }
 
                             break;
@@ -146,15 +149,20 @@ public class W4Parser {
         if (TypeAdapters.isContainType(clazz)) {
             String data = (w4JPath.getAttr() != null && !w4JPath.getAttr().isEmpty())
                     ? element.attr(w4JPath.getAttr()).trim():element.text().trim();
-            if (w4JPath.getXpath().postProcessValue().length > 0) {
-                for (W4RegExp w4RegExp : w4JPath.getXpath().postProcessValue()) {
+            if (w4JPath.getXpath().postProcess().length > 0) {
+                for (W4RegExp w4RegExp : w4JPath.getXpath().postProcess()) {
                     data = data.replaceAll(w4RegExp.search(), w4RegExp.replace());
                 }
             }
             if (data == null || data.isEmpty()) {
                 data = w4JPath.getXpath().defaultValue();
             }
-            return TypeAdapters.getValue(data.trim(), clazz);
+            try {
+                return TypeAdapters.getValue(data.trim(), clazz);
+            } catch (NumberFormatException e) {
+                LOG.warn("Cast exception on field {}. Details: {}", w4JPath.getPath(), e.getMessage());
+                return null;
+            }
         }
         try {
             T value = clazz.newInstance();

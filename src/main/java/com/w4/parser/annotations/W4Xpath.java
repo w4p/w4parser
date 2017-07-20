@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
 public @interface W4Xpath {
     String[] path();
     String defaultValue() default "";
-    W4RegExp[] postProcessValue() default {};
+    W4RegExp[] postProcess() default {};
     int maxCount() default  0;
 }

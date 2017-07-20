@@ -4,7 +4,6 @@ import com.w4.parser.annotations.W4RegExp;
 import com.w4.parser.annotations.W4Xpath;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.util.List;
 
@@ -13,7 +12,7 @@ import java.util.List;
 @W4Xpath(path = "/body")
 public class TestPageModel {
 
-    @W4Xpath(path = "//h1:eq(0)", postProcessValue = {@W4RegExp(search = "^(\\w+)\\s.*$", replace = "$1")})
+    @W4Xpath(path = "//h1:eq(0)", postProcess = {@W4RegExp(search = "^(\\w+)\\s.*$", replace = "$1")})
     private String title;
 
     @W4Xpath(path = "//h1:eq(0)/@class")
@@ -74,11 +73,27 @@ public class TestPageModel {
         @W4Xpath(path = "/div[class='comment']")
         private String comment;
 
+        @W4Xpath(path = "/span[class=\"rating\"]")
+        private int rating;
+
+        @W4Xpath(path = "/span[class=\"boolean\"]")
+        private boolean enabled;
+
+        @W4Xpath(path = "/span[class=\"float\"]")
+        private float floatVal;
+
+        @W4Xpath(path = "/span[class*=\"floatValValid\"]")
+        private float floatValValid;
+
         @Override
         public String toString() {
             return "TestReview{" +
                     "author='" + author + '\'' +
                     ", comment='" + comment + '\'' +
+                    ", rating=" + rating +
+                    ", enabled=" + enabled +
+                    ", floatVal=" + floatVal +
+                    ", floatValValid=" + floatValValid +
                     '}';
         }
     }
