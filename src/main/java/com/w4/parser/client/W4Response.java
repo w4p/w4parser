@@ -23,9 +23,6 @@ public class W4Response {
     }
 
     public <T> void parseAsync(Class<T> clazz, W4ParsePromise<T> promise) {
-        CompletableFuture<T> result = W4Parser.parseAsync(this.content, clazz);
-        result.thenAccept((model) -> {
-            promise.complete(model);
-        });
+        W4Parser.parseAsync(this.content, clazz, promise);
     }
 }

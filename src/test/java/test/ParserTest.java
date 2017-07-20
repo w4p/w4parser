@@ -49,7 +49,8 @@ public class ParserTest {
     }
 
     @Test
-    public void testParserAsync() {
+    public void testParserAsync() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
         W4Parser.data(TestHtmlData.htmlReviewData()).parseAsync(TestPageModel.class, (model) -> {
             if (model == null) {
                 fail( "Something wrong with parser. TestPageModel is null");
@@ -74,10 +75,11 @@ public class ParserTest {
             assertEquals(model.getReview().getFloatVal(), 0.0f, 0f);
             assertEquals(model.getReview().getFloatValValid(), 4.007f, 0f);
 
-
             LOG.info("Result: {}", model);
+            latch.countDown();
         });
         LOG.info("Waiting for parsing result.");
+        latch.await();
     }
 
 //    @Test

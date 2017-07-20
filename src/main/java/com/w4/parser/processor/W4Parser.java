@@ -5,6 +5,7 @@ import com.w4.parser.annotations.W4RegExp;
 import com.w4.parser.annotations.W4Xpath;
 import com.w4.parser.client.W4Request;
 import com.w4.parser.client.W4Response;
+import com.w4.parser.client.promise.W4ParsePromise;
 import com.w4.parser.exceptions.W4ParserException;
 import com.w4.parser.jpath.W4JPath;
 import org.jsoup.Jsoup;
@@ -31,9 +32,11 @@ public class W4Parser {
         return response;
     }
 
-    public static <T> CompletableFuture<T> parseAsync(String html, Class<T> clazz) throws W4ParserException {
-        final CompletableFuture<T> result = CompletableFuture.supplyAsync(() -> parse(html, clazz));
-        return result;
+    public static <T> void parseAsync(String html, Class<T> clazz, W4ParsePromise promise) throws W4ParserException {
+        CompletableFuture.runAsync(() -> {
+            T model = parse(html, clazz);
+            promise.complete(model);
+        });
     }
 
     public static <T> T parse(String html, Class<T> clazz) throws W4ParserException {
