@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.concurrent.CompletableFuture;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,5 +19,10 @@ public class W4Response {
 
     public <T> T parse(Class<T> clazz) {
         return W4Parser.parse(this.content, clazz);
+    }
+
+    public <T> void parseAsync(Class<T> clazz, W4ParsePromise<T> promise) {
+        T model = W4Parser.parse(this.content, clazz);
+        promise.complete(model);
     }
 }

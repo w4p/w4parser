@@ -108,5 +108,11 @@ public class W4Request {
         });
     }
 
+    public <T> void parseAsync(Class<T> clazz, W4ParsePromise<T> promise) {
+        fetchAsync(response -> {
+            response.parseAsync(clazz, promise);
+        });
+    }
+
 
 }
