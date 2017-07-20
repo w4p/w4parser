@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import test.data.TestHtmlData;
+import test.model.RemoteTestModel;
 import test.model.TestPageModel;
 
 import static org.junit.Assert.assertEquals;
@@ -13,7 +14,7 @@ import static org.junit.Assert.fail;
 public class ParserTest {
     private static final Logger LOG = LoggerFactory.getLogger(ParserTest.class);
 
-    @Test
+//    @Test
     public void testParser() {
         TestPageModel model = W4Parser.parse(TestHtmlData.htmlReviewData(), TestPageModel.class);
 
@@ -43,6 +44,14 @@ public class ParserTest {
 
         LOG.info("Result: {}", model);
 
+    }
+
+    @Test
+    public void remote() {
+        String url = "https://www.ebay.com/sch/Cell-Phones-Smartphones-/9355/i.html";
+        RemoteTestModel model = W4Parser.url(url).parse(RemoteTestModel.class);
+
+        LOG.info("Remote result: {}", model);
     }
 
 }

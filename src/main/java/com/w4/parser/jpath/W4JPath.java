@@ -4,7 +4,6 @@ import com.w4.parser.annotations.W4Xpath;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.jsoup.helper.StringUtil;
 
 @Getter
 @Setter

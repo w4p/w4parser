@@ -3,6 +3,7 @@ package com.w4.parser.processor;
 import com.w4.parser.adapters.TypeAdapters;
 import com.w4.parser.annotations.W4RegExp;
 import com.w4.parser.annotations.W4Xpath;
+import com.w4.parser.client.W4Request;
 import com.w4.parser.exceptions.W4ParserException;
 import com.w4.parser.jpath.W4JPath;
 import org.jsoup.Jsoup;
@@ -18,6 +19,10 @@ import java.util.*;
 public class W4Parser {
     private static final Logger LOG = LoggerFactory.getLogger(W4Parser.class);
 
+    public static W4Request url(String url) {
+        return W4Request.url(url);
+    }
+
     public static <T> T parse(String html, Class<T> clazz) throws W4ParserException {
         T model = null;
         try {
@@ -26,8 +31,10 @@ public class W4Parser {
 
             if (clazz.isAnnotationPresent(W4Xpath.class)) {
                 W4Xpath w4Xpath = clazz.getAnnotation(W4Xpath.class);
-                W4JPath w4JPath = new W4JPath(w4Xpath, w4Xpath.path()[0]);
-                document = document.select(w4JPath.getPath()).first();
+                if (w4Xpath.path().length > 0 && !w4Xpath.path()[0].isEmpty()) {
+                    W4JPath w4JPath = new W4JPath(w4Xpath, w4Xpath.path()[0]);
+                    document = document.select(w4JPath.getPath()).first();
+                }
             }
 
             parse(document, model);
