@@ -8,13 +8,15 @@ import test.data.TestHtmlData;
 import test.model.RemoteTestModel;
 import test.model.TestPageModel;
 
+import java.util.concurrent.CountDownLatch;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class ParserTest {
     private static final Logger LOG = LoggerFactory.getLogger(ParserTest.class);
 
-//    @Test
+    @Test
     public void testParser() {
         TestPageModel model = W4Parser.parse(TestHtmlData.htmlReviewData(), TestPageModel.class);
 
@@ -46,12 +48,30 @@ public class ParserTest {
 
     }
 
-    @Test
-    public void remote() {
+//    @Test
+    public void remoteSync() {
         String url = "https://www.ebay.com/sch/Cell-Phones-Smartphones-/9355/i.html";
         RemoteTestModel model = W4Parser.url(url).parse(RemoteTestModel.class);
 
         LOG.info("Remote result: {}", model);
+    }
+
+    @Test
+    public void remoteAsync() {
+        CountDownLatch latch = new CountDownLatch(1);
+        String url = "https://www.ebay.com/sch/Cell-Phones-Smartphones-/9355/i.html";
+        W4Parser.url(url).parseAsync(RemoteTestModel.class, (remoteTestModel -> {
+            LOG.info("Fetched model by async method: {}", remoteTestModel);
+            latch.countDown();
+        }));
+
+        LOG.info("Async request sended. Wait for result.");
+        try {
+            latch.await();
+            LOG.info("Completed");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }
