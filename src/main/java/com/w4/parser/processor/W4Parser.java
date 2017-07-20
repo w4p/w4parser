@@ -4,6 +4,7 @@ import com.w4.parser.adapters.TypeAdapters;
 import com.w4.parser.annotations.W4RegExp;
 import com.w4.parser.annotations.W4Xpath;
 import com.w4.parser.client.W4Request;
+import com.w4.parser.client.W4Response;
 import com.w4.parser.exceptions.W4ParserException;
 import com.w4.parser.jpath.W4JPath;
 import org.jsoup.Jsoup;
@@ -21,6 +22,12 @@ public class W4Parser {
 
     public static W4Request url(String url) {
         return W4Request.url(url);
+    }
+
+    public static W4Response data(String html) {
+        W4Response response = new W4Response();
+        response.setContent(html);
+        return response;
     }
 
     public static <T> T parse(String html, Class<T> clazz) throws W4ParserException {

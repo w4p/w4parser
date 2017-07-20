@@ -18,7 +18,7 @@ public class ParserTest {
 
     @Test
     public void testParser() {
-        TestPageModel model = W4Parser.parse(TestHtmlData.htmlReviewData(), TestPageModel.class);
+        TestPageModel model = W4Parser.data(TestHtmlData.htmlReviewData()).parse(TestPageModel.class);
 
         if (model == null) {
             fail( "Something wrong with parser. TestPageModel is null");
