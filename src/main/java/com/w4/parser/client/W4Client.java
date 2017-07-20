@@ -16,7 +16,7 @@ public class W4Client {
     private W4Client() {
         jettyClient = new HttpClient(new SslContextFactory(true));
         jettyClient.setConnectBlocking(false);
-        jettyClient.setMaxConnectionsPerDestination(100);
+        jettyClient.setMaxConnectionsPerDestination(5);
         jettyClient.setMaxRequestsQueuedPerDestination(500);
         jettyClient.setFollowRedirects(true);
         jettyClient.setMaxRedirects(3);

@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class W4Response {
+    private String url;
     private int responseCode;
     private String content = "";
 

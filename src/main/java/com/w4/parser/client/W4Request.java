@@ -3,9 +3,13 @@ package com.w4.parser.client;
 import lombok.Getter;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.api.Request;
+import org.eclipse.jetty.client.api.Result;
+import org.eclipse.jetty.client.util.BufferingResponseListener;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.HttpVersion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -13,6 +17,7 @@ import java.util.concurrent.TimeoutException;
 
 @Getter
 public class W4Request {
+    private static final Logger LOG = LoggerFactory.getLogger(W4Request.class);
 
     private Request request;
 
@@ -67,9 +72,41 @@ public class W4Request {
         return response;
     }
 
+
     public <T> T parse(Class<T> clazz) {
         W4Response response = fetch();
         return response.parse(clazz);
     }
+
+    public void fetchAsync(W4ResponsePromise responsePromise) {
+        this.request.send(new BufferingResponseListener(1024*1024*500) {
+            final W4Response response = new W4Response();
+            @Override
+            public void onComplete(Result result) {
+                response.setUrl(request.getURI().toString());
+                try {
+                    response.setResponseCode(result.getResponse().getStatus());
+                    if (result.isSucceeded()) {
+                        if (response.getResponseCode() == 200) {
+                            response.setContent(getContentAsString());
+                        }
+                    }
+                    Throwable t = result.getResponseFailure();
+                    if (t != null) {
+                        response.setError(t.getMessage());
+                    }
+                } catch (Throwable t) {
+                    LOG.warn(t.getMessage(), request.getURI());
+                } finally {
+                    try {
+                        responsePromise.complete(response);
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
 
 }
