@@ -7,7 +7,7 @@
     </layout>
   </appender>
   
-  <logger name="com.w4.parser" level="DEBUG"/>
+  <logger name="com.w4.parser" level="INFO"/>
   
 
   <root level="INFO">
