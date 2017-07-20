@@ -48,6 +48,38 @@ public class ParserTest {
 
     }
 
+    @Test
+    public void testParserAsync() {
+        W4Parser.data(TestHtmlData.htmlReviewData()).parseAsync(TestPageModel.class, (model) -> {
+            if (model == null) {
+                fail( "Something wrong with parser. TestPageModel is null");
+            }
+
+            assertEquals(model.getTitle(), "Test");
+            assertEquals(model.getReview().getAuthor(), "Author");
+            assertEquals(model.getReview().getComment(), "Comment text");
+            assertEquals(model.getLinks().size(), 5);
+
+            assertEquals(model.getLinks().get(0).getText(), "A link 1");
+            assertEquals(model.getLinks().get(1).getText(), "A link 2");
+            assertEquals(model.getLinks().get(2).getText(), "A link 3");
+            assertEquals(model.getLinks().get(3).getText(), "A link 4");
+            assertEquals(model.getLinks().get(4).getText(), "A link 5");
+
+            assertEquals(model.getNotfoundTitle(), null);
+            assertEquals(model.getNotfoundReview(), null);
+
+            assertEquals(model.getReview().isEnabled(), true);
+            assertEquals(model.getReview().getRating(), 4);
+            assertEquals(model.getReview().getFloatVal(), 0.0f, 0f);
+            assertEquals(model.getReview().getFloatValValid(), 4.007f, 0f);
+
+
+            LOG.info("Result: {}", model);
+        });
+        LOG.info("Waiting for parsing result.");
+    }
+
 //    @Test
     public void remoteSync() {
         String url = "https://www.ebay.com/sch/Cell-Phones-Smartphones-/9355/i.html";
