@@ -1,11 +1,10 @@
 package com.w4.parser.client;
 
+import com.w4.parser.client.promise.W4ParsePromise;
 import com.w4.parser.processor.W4Parser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.concurrent.CompletableFuture;
 
 @Getter
 @Setter

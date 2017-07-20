@@ -1,5 +1,7 @@
 package com.w4.parser.client;
 
+import com.w4.parser.client.promise.W4ParsePromise;
+import com.w4.parser.client.promise.W4ResponsePromise;
 import lombok.Getter;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.api.Request;
