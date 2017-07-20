@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class W4Parser {
     private static final Logger LOG = LoggerFactory.getLogger(W4Parser.class);
@@ -28,6 +29,11 @@ public class W4Parser {
         W4Response response = new W4Response();
         response.setContent(html);
         return response;
+    }
+
+    public static <T> CompletableFuture<T> parseAsync(String html, Class<T> clazz) throws W4ParserException {
+        final CompletableFuture<T> result = CompletableFuture.supplyAsync(() -> parse(html, clazz));
+        return result;
     }
 
     public static <T> T parse(String html, Class<T> clazz) throws W4ParserException {
