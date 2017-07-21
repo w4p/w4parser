@@ -93,6 +93,10 @@ public class W4Queue {
         return result.getFirst();
     }
 
+    public <T extends Object> void get(W4ParsePromise w4ParsePromise) {
+        run((result -> w4ParsePromise.complete(result.getFirst())));
+    }
+
     public void runTaskList(CountDownLatch latch) {
         W4QueueTask task;
         while ((task = getTask()) != null && activeThreads < maxThreads) {
