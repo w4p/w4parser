@@ -9,6 +9,8 @@ import com.w4.parser.client.promise.W4QueueTaskPromise;
 import com.w4.parser.processor.W4Parser;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -17,6 +19,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class W4Queue {
+    private static final Logger LOG = LoggerFactory.getLogger(W4Parser.class);
 
     private Queue<W4QueueTask> requestList = new ConcurrentLinkedQueue<>();
     private Map<Integer, Integer> index = new HashMap<>();
@@ -94,6 +97,9 @@ public class W4Queue {
     }
 
     public <T extends Object> void get(W4ParsePromise w4ParsePromise) {
+        if (this.requestList.size() > 1) {
+            LOG.warn("W4Parser queue contains {} items, but used only first", this.requestList.size());
+        }
         run((result -> w4ParsePromise.complete(result.getFirst())));
     }
 
