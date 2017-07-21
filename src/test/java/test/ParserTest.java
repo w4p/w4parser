@@ -140,11 +140,12 @@ public class ParserTest {
 
         W4Parser
                 .queue()
-                    .threads(1)
-                    .timeout(1200, TimeUnit.MILLISECONDS)
+                    .threads(5)
+                    .timeout(3000, TimeUnit.MILLISECONDS)
                     .url(url4, RemoteTestModel.class)
                         .setup()
                             .header(HttpHeader.ACCEPT_CHARSET, "*/*")
+                            .timeout(400, TimeUnit.MILLISECONDS)
                             .agent("My UserAgent")
                         .done()
                     .url(url3, HabrahabrModel.class)
