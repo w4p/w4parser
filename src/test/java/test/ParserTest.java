@@ -139,6 +139,7 @@ public class ParserTest {
 
         W4Parser
                 .queue()
+                    .threads(1)
                     .url(url4, RemoteTestModel.class)
                         .setup()
                             .header(HttpHeader.ACCEPT_CHARSET, "*/*")
@@ -146,7 +147,7 @@ public class ParserTest {
                         .done()
                     .url(url3, HabrahabrModel.class)
                     .onProgress((task, model) -> {
-                        LOG.debug("Complete process: {}, model: {}", task.getUrl(), model);
+                        LOG.info("Complete process: {}, model: {}", task.getUrl(), model);
                     })
                 .run((result -> {
                     latch.countDown();
