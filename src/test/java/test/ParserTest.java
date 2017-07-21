@@ -47,7 +47,8 @@ public class ParserTest {
         assertEquals(model.getReview().getFloatValValid(), 4.007f, 0f);
 
 
-        LOG.info("Result: {}", model);
+        LOG.debug("Result: {}", model);
+        LOG.info("Sync parsing test passed.");
 
     }
 
@@ -78,11 +79,12 @@ public class ParserTest {
             assertEquals(model.getReview().getFloatVal(), 0.0f, 0f);
             assertEquals(model.getReview().getFloatValValid(), 4.007f, 0f);
 
-            LOG.info("Result: {}", model);
+            LOG.debug("Result: {}", model);
             latch.countDown();
         });
-        LOG.info("Waiting for parsing result.");
+        LOG.debug("Waiting for parsing result.");
         latch.await();
+        LOG.info("Async parsing test passed.");
     }
 
 //    @Test
@@ -94,46 +96,65 @@ public class ParserTest {
     }
 
     @Test
-    public void remoteAsync() {
+    public void remoteAsync() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
         String url = "https://www.ebay.com/sch/Cell-Phones-Smartphones-/9355/i.html";
         W4Parser.url(url).parseAsync(RemoteTestModel.class, (remoteTestModel -> {
-            LOG.info("Fetched model by async method: {}", remoteTestModel);
+            LOG.debug("Fetched model by async method: {}", remoteTestModel);
             latch.countDown();
         }));
 
-        LOG.info("Async request sended. Wait for result.");
-        try {
-            latch.await();
-            LOG.info("Completed");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        LOG.debug("Async request sended. Wait for result.");
+        latch.await();
+        LOG.info("Remote async parse test passed.");
     }
 
     @Test
     public void queue() {
         String url1 = "https://habrahabr.ru/users/";
         String url2 = "https://habrahabr.ru/hubs/";
+        W4QueueResult result = W4Parser
+                                .queue()
+                                    .url(url1, HabrahabrModel.class)
+                                    .url(url2, HabrahabrModel.class)
+                                    .onProgress((task, model) -> {
+                                        LOG.debug("Complete process: {}, model: {}", task.getUrl(), model);
+                                    })
+                                .run();
+        LOG.debug("W4Queue result: {}", result);
+        for (Iterator<HabrahabrModel> it = result.iterator(); it.hasNext();) {
+            HabrahabrModel m = it.next();
+            LOG.debug("Res: {}", m.getTitle());
+        }
+
+        LOG.info("Queue test passed");
+    }
+
+    @Test
+    public void queueAsync() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
         String url3 = "https://habrahabr.ru/companies/";
         String url4 = "https://www.ebay.com/sch/Cell-Phones-Smartphones-/9355/i.html";
 
-        W4QueueResult<HabrahabrModel> result = W4Parser
-                                .queue()
-                                    .url(url1, HabrahabrModel.class)
-//                                    .url(url4, RemoteTestModel.class)
-                                    .url(url2, HabrahabrModel.class)
-                                    .url(url3, HabrahabrModel.class)
-//                                    .data(TestHtmlData.htmlReviewData(), TestPageModel.class)
-                                .run();
+        W4Parser
+                .queue()
+                    .url(url4, RemoteTestModel.class)
+                    .url(url3, HabrahabrModel.class)
+                    .onProgress((task, model) -> {
+                        LOG.debug("Complete process: {}, model: {}", task.getUrl(), model);
+                    })
+                .run((result -> {
+                    latch.countDown();
+                    LOG.debug("W4Queue result: {}", result);
+                    for (Iterator it = result.iterator(); it.hasNext();) {
+                        Object m = it.next();
+                        LOG.debug("Res: {}", m.toString());
+                    }
+                }));
 
-        LOG.info("W4Queue result: {}", result);
-        for (Iterator<HabrahabrModel> it = result.iterator(); it.hasNext();) {
-            HabrahabrModel m = it.next();
-            LOG.info("Res: {}", m.getTitle());
-        }
-
-
+        LOG.debug("Waiting for async result.");
+        latch.await();
+        LOG.info("Async queue test passed.");
     }
 
 }

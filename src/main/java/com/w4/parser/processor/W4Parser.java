@@ -3,7 +3,7 @@ package com.w4.parser.processor;
 import com.w4.parser.adapters.TypeAdapters;
 import com.w4.parser.annotations.W4RegExp;
 import com.w4.parser.annotations.W4Xpath;
-import com.w4.parser.client.W4Queue;
+import com.w4.parser.client.queue.W4Queue;
 import com.w4.parser.client.W4Request;
 import com.w4.parser.client.W4Response;
 import com.w4.parser.client.promise.W4ParsePromise;

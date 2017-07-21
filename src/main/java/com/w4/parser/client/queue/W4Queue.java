@@ -1,5 +1,8 @@
-package com.w4.parser.client;
+package com.w4.parser.client.queue;
 
+import com.w4.parser.client.W4QueueResult;
+import com.w4.parser.client.promise.W4QueueProgressPromise;
+import com.w4.parser.client.promise.W4QueuePromise;
 import com.w4.parser.processor.W4Parser;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +20,8 @@ public class W4Queue {
     private Map<Integer, Integer> index = new HashMap<>();
     private W4QueueResult result = new W4QueueResult();
 
+    private W4QueueProgressPromise progressPromise;
+
     public synchronized W4Queue data(String data, Class clazz) {
         W4QueueTask task = new W4QueueTask(clazz).setData(data);
         addQueue(task);
@@ -26,6 +31,11 @@ public class W4Queue {
     public synchronized W4Queue url(String url, Class clazz) {
         W4QueueTask task = new W4QueueTask(clazz).setUrl(url);
         addQueue(task);
+        return this;
+    }
+
+    public W4Queue onProgress(W4QueueProgressPromise progressPromise) {
+        this.progressPromise = progressPromise;
         return this;
     }
 
@@ -42,12 +52,18 @@ public class W4Queue {
                 W4Parser.url(task.getUrl()).parseAsync(task.getClazz(), model -> {
                     int idx = this.index.get(task.hashCode());
                     this.result.addResult(idx, model);
+                    if (this.progressPromise != null) {
+                        this.progressPromise.onProgress(task, model);
+                    }
                     latch.countDown();
                 });
             } else {
                 W4Parser.data(task.getData()).parseAsync(task.getClazz(), model -> {
                     int idx = this.index.get(task.hashCode());
                     this.result.addResult(idx, model);
+                    if (this.progressPromise != null) {
+                        this.progressPromise.onProgress(task, model);
+                    }
                     latch.countDown();
                 });
             }
@@ -59,26 +75,7 @@ public class W4Queue {
         return this.result;
     }
 
-
-    @Getter
-    @Setter
-    private static class W4QueueTask<T> {
-        private String url;
-        private String data;
-        private Class<T> clazz;
-
-        public W4QueueTask(Class<T> clazz) {
-            this.clazz = clazz;
-        }
-
-        public W4QueueTask setData(String data) {
-            this.data = data;
-            return this;
-        }
-
-        public W4QueueTask setUrl(String url) {
-            this.url = url;
-            return this;
-        }
+    public void run(W4QueuePromise w4QueuePromise) {
+        CompletableFuture.runAsync(() -> w4QueuePromise.complete(run()));
     }
 }

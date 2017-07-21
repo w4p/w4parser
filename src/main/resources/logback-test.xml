@@ -8,9 +8,10 @@
   </appender>
   
   <logger name="com.w4.parser" level="INFO"/>
-  
+  <logger name="test" level="INFO"/>
 
-  <root level="INFO">
+
+  <root level="ERROR">
     <appender-ref ref="STDOUT" />
   </root>
 </configuration>
