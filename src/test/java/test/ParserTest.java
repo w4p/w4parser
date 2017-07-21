@@ -1,13 +1,16 @@
 package test;
 
+import com.w4.parser.client.W4QueueResult;
 import com.w4.parser.processor.W4Parser;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import test.data.TestHtmlData;
+import test.model.HabrahabrModel;
 import test.model.RemoteTestModel;
 import test.model.TestPageModel;
 
+import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
 
 import static org.junit.Assert.assertEquals;
@@ -18,7 +21,7 @@ public class ParserTest {
 
     @Test
     public void testParser() {
-        TestPageModel model = W4Parser.data(TestHtmlData.htmlReviewData()).parse(TestPageModel.class);
+        TestPageModel model = W4Parser.data(TestHtmlData.htmlReviewData(), TestPageModel.class);
 
         if (model == null) {
             fail( "Something wrong with parser. TestPageModel is null");
@@ -106,6 +109,31 @@ public class ParserTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void queue() {
+        String url1 = "https://habrahabr.ru/users/";
+        String url2 = "https://habrahabr.ru/hubs/";
+        String url3 = "https://habrahabr.ru/companies/";
+        String url4 = "https://www.ebay.com/sch/Cell-Phones-Smartphones-/9355/i.html";
+
+        W4QueueResult<HabrahabrModel> result = W4Parser
+                                .queue()
+                                    .url(url1, HabrahabrModel.class)
+//                                    .url(url4, RemoteTestModel.class)
+                                    .url(url2, HabrahabrModel.class)
+                                    .url(url3, HabrahabrModel.class)
+//                                    .data(TestHtmlData.htmlReviewData(), TestPageModel.class)
+                                .run();
+
+        LOG.info("W4Queue result: {}", result);
+        for (Iterator<HabrahabrModel> it = result.iterator(); it.hasNext();) {
+            HabrahabrModel m = it.next();
+            LOG.info("Res: {}", m.getTitle());
+        }
+
+
     }
 
 }

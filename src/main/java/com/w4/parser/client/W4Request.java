@@ -22,9 +22,11 @@ public class W4Request {
     private static final Logger LOG = LoggerFactory.getLogger(W4Request.class);
 
     private Request request;
+    private String url;
 
     public W4Request(String url) {
-        request = W4Client.get().client().newRequest(url);
+        this.url = url;
+        this.request = W4Client.get().client().newRequest(url);
     }
 
     public static W4Request url(String url) {
@@ -64,6 +66,7 @@ public class W4Request {
     public W4Response fetch() {
         W4Response response = new W4Response();
         try {
+            LOG.info("Fetch data from: {}", this.request.getURI());
             ContentResponse r = this.request.send();
             response.setResponseCode(r.getStatus());
             response.setContent(r.getContentAsString());
@@ -81,6 +84,7 @@ public class W4Request {
     }
 
     public void fetchAsync(W4ResponsePromise responsePromise) {
+        LOG.info("Fetch data from: {}", this.request.getURI());
         this.request.send(new BufferingResponseListener(1024*1024*500) {
             final W4Response response = new W4Response();
             @Override
@@ -111,9 +115,7 @@ public class W4Request {
     }
 
     public <T> void parseAsync(Class<T> clazz, W4ParsePromise<T> promise) {
-        fetchAsync(response -> {
-            response.parseAsync(clazz, promise);
-        });
+        fetchAsync(response -> promise.complete(response.parse(clazz)));
     }
 
 

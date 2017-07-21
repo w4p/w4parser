@@ -3,6 +3,7 @@ package com.w4.parser.processor;
 import com.w4.parser.adapters.TypeAdapters;
 import com.w4.parser.annotations.W4RegExp;
 import com.w4.parser.annotations.W4Xpath;
+import com.w4.parser.client.W4Queue;
 import com.w4.parser.client.W4Request;
 import com.w4.parser.client.W4Response;
 import com.w4.parser.client.promise.W4ParsePromise;
@@ -22,14 +23,37 @@ import java.util.concurrent.CompletableFuture;
 public class W4Parser {
     private static final Logger LOG = LoggerFactory.getLogger(W4Parser.class);
 
+    public static W4Queue queue() {
+        return new W4Queue();
+    }
+
     public static W4Request url(String url) {
         return W4Request.url(url);
+    }
+
+    public static <T> T url(String url, Class<T> clazz) {
+        W4Request request = W4Request.url(url);
+        return request.parse(clazz);
     }
 
     public static W4Response data(String html) {
         W4Response response = new W4Response();
         response.setContent(html);
         return response;
+    }
+
+    public static <T> T data(String html, Class<T> clazz) {
+        W4Response response = new W4Response();
+        response.setContent(html);
+        return response.parse(clazz);
+    }
+
+    public static <T> CompletableFuture<T> parseAsync(String html, Class<T> clazz) throws W4ParserException {
+        final CompletableFuture<T> future = new CompletableFuture<>();
+        parseAsync(html, clazz, (model) -> {
+            future.completedFuture(model);
+        });
+        return future;
     }
 
     public static <T> void parseAsync(String html, Class<T> clazz, W4ParsePromise promise) throws W4ParserException {
