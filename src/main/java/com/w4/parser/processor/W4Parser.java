@@ -68,7 +68,7 @@ public class W4Parser {
 
     public static <T> T parse(String html, Class<T> clazz) throws W4ParserException {
         T model = null;
-//        final CompletableFuture<T> future = new CompletableFuture<>();
+        final CompletableFuture<T> future = new CompletableFuture<>();
         try {
             model = clazz.newInstance();
             Element document = Jsoup.parse(html);
@@ -90,7 +90,6 @@ public class W4Parser {
             }
 
             parse(document, model, stopTime);
-
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException e) {
             throw new W4ParserException(e);
         }

@@ -1,6 +1,8 @@
 package com.w4.parser.client;
 
 import com.w4.parser.client.promise.W4ParsePromise;
+import com.w4.parser.client.queue.HasQueue;
+import com.w4.parser.client.queue.W4Queue;
 import com.w4.parser.processor.W4Parser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +19,8 @@ public class W4Response {
     private String content = "";
 
     private String error;
+
+    private W4Queue queue;
 
     public <T> T parse(Class<T> clazz) {
         return W4Parser.parse(this.content, clazz);

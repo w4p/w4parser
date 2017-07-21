@@ -2,6 +2,7 @@ package test;
 
 import com.w4.parser.client.W4QueueResult;
 import com.w4.parser.processor.W4Parser;
+import org.eclipse.jetty.http.HttpHeader;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,6 +140,10 @@ public class ParserTest {
         W4Parser
                 .queue()
                     .url(url4, RemoteTestModel.class)
+                        .setup()
+                            .header(HttpHeader.ACCEPT_CHARSET, "*/*")
+                            .agent("My UserAgent")
+                        .done()
                     .url(url3, HabrahabrModel.class)
                     .onProgress((task, model) -> {
                         LOG.debug("Complete process: {}, model: {}", task.getUrl(), model);

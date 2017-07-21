@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @W4Xpath(followURL = "//a")
-@W4ParserOption(timeout = 15000, timeUnit = TimeUnit.MILLISECONDS)
+@W4ParserOption(timeout = 100, timeUnit = TimeUnit.MILLISECONDS)
 public class RemoteTestModel {
 
     @W4Xpath(path = "/h1[class=\"bcrs\"]//b")

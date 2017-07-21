@@ -2,6 +2,8 @@ package com.w4.parser.client;
 
 import com.w4.parser.client.promise.W4ParsePromise;
 import com.w4.parser.client.promise.W4ResponsePromise;
+import com.w4.parser.client.queue.HasQueue;
+import com.w4.parser.client.queue.W4Queue;
 import lombok.Getter;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.api.Request;
@@ -18,8 +20,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @Getter
-public class W4Request {
+public class W4Request implements HasQueue {
     private static final Logger LOG = LoggerFactory.getLogger(W4Request.class);
+
+    private W4Queue queue;
 
     private Request request;
     private String url;
@@ -28,6 +32,14 @@ public class W4Request {
 
     private long timeout = 30000;
     private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
+
+    public W4Request(W4Queue queue) {
+        this.queue = queue;
+    }
+
+    public W4Queue done() {
+        return this.queue;
+    }
 
     public W4Request(String url) {
         this.url = url;
@@ -38,6 +50,10 @@ public class W4Request {
 
     public static W4Request url(String url) {
         return new W4Request(url);
+    }
+
+    public void setQueue(W4Queue queue) {
+        this.queue = queue;
     }
 
     public W4Request method(HttpMethod method) {
