@@ -20,7 +20,11 @@ public class W4Response {
 
     private String error;
 
-    private W4Queue queue;
+    private W4Request request;
+
+    public W4Response(W4Request request) {
+        this.request = request;
+    }
 
     public <T> T parse(Class<T> clazz) {
         return W4Parser.parse(this.content, clazz);

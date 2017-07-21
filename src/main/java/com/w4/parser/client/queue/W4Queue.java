@@ -35,7 +35,6 @@ public class W4Queue {
 
     public synchronized W4Queue data(String data, Class clazz) {
         W4QueueTask task = new W4QueueTask(clazz).setData(data);
-        task.getW4Response().setQueue(this);
         addQueue(task);
         this.lastTask = task;
         return this;
@@ -51,6 +50,12 @@ public class W4Queue {
 
     public W4Queue threads(int max) {
         this.maxThreads = max;
+        return this;
+    }
+
+    public W4Queue timeout(long timeout, TimeUnit timeUnit) {
+        this.timeout = timeout;
+        this.timeUnit = timeUnit;
         return this;
     }
 

@@ -96,7 +96,7 @@ public class W4Request implements HasQueue {
 
     public W4Response fetch() {
         this.startedAt = System.currentTimeMillis();
-        W4Response response = new W4Response();
+        W4Response response = new W4Response(this);
         try {
             LOG.info("Fetch data from: {}", this.request.getURI());
             ContentResponse r = this.request.send();
@@ -112,8 +112,9 @@ public class W4Request implements HasQueue {
     public void fetchAsync(W4ResponsePromise responsePromise) {
         this.startedAt = System.currentTimeMillis();
         LOG.info("Fetch data from: {}", this.request.getURI());
+        final W4Request req = this;
         this.request.send(new BufferingResponseListener(1024*1024*500) {
-            final W4Response response = new W4Response();
+            final W4Response response = new W4Response(req);
             @Override
             public void onComplete(Result result) {
                 response.setUrl(request.getURI().toString());

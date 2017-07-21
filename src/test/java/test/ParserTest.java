@@ -13,6 +13,7 @@ import test.model.TestPageModel;
 
 import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -140,6 +141,7 @@ public class ParserTest {
         W4Parser
                 .queue()
                     .threads(1)
+                    .timeout(1200, TimeUnit.MILLISECONDS)
                     .url(url4, RemoteTestModel.class)
                         .setup()
                             .header(HttpHeader.ACCEPT_CHARSET, "*/*")
