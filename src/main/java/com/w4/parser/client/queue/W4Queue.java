@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class W4Queue {
 
@@ -21,6 +22,8 @@ public class W4Queue {
     private W4QueueResult result = new W4QueueResult();
 
     private W4QueueProgressPromise progressPromise;
+    private long timeout = 60000 * 10;
+    private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
 
     public synchronized W4Queue data(String data, Class clazz) {
         W4QueueTask task = new W4QueueTask(clazz).setData(data);
@@ -69,7 +72,7 @@ public class W4Queue {
             }
         }
         try {
-            latch.await();
+            latch.await(this.timeout, this.timeUnit);
         } catch (InterruptedException e) {
         }
         return this.result;

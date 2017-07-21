@@ -24,9 +24,16 @@ public class W4Request {
     private Request request;
     private String url;
 
+    private long startedAt;
+
+    private long timeout = 30000;
+    private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
+
     public W4Request(String url) {
         this.url = url;
-        this.request = W4Client.get().client().newRequest(url);
+        this.request = W4Client.get().client()
+                .newRequest(url)
+                .timeout(this.timeout, this.timeUnit);
     }
 
     public static W4Request url(String url) {
@@ -38,7 +45,15 @@ public class W4Request {
         return this;
     }
 
+    public W4Request timeout(long timeout) {
+        this.timeout = timeout;
+        this.request.timeout(timeout, timeUnit);
+        return this;
+    }
+
     public W4Request timeout(long timeout, TimeUnit timeUnit) {
+        this.timeout = timeout;
+        this.timeUnit = timeUnit;
         this.request.timeout(timeout, timeUnit);
         return this;
     }
@@ -64,6 +79,7 @@ public class W4Request {
     }
 
     public W4Response fetch() {
+        this.startedAt = System.currentTimeMillis();
         W4Response response = new W4Response();
         try {
             LOG.info("Fetch data from: {}", this.request.getURI());
@@ -77,13 +93,8 @@ public class W4Request {
         return response;
     }
 
-
-    public <T> T parse(Class<T> clazz) {
-        W4Response response = fetch();
-        return response.parse(clazz);
-    }
-
     public void fetchAsync(W4ResponsePromise responsePromise) {
+        this.startedAt = System.currentTimeMillis();
         LOG.info("Fetch data from: {}", this.request.getURI());
         this.request.send(new BufferingResponseListener(1024*1024*500) {
             final W4Response response = new W4Response();
@@ -112,6 +123,11 @@ public class W4Request {
                 }
             }
         });
+    }
+
+    public <T> T parse(Class<T> clazz) {
+        W4Response response = fetch();
+        return response.parse(clazz);
     }
 
     public <T> void parseAsync(Class<T> clazz, W4ParsePromise<T> promise) {
