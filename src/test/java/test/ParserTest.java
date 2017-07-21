@@ -92,7 +92,7 @@ public class ParserTest {
 //    @Test
     public void remoteSync() {
         String url = "https://www.ebay.com/sch/Cell-Phones-Smartphones-/9355/i.html";
-        RemoteTestModel model = W4Parser.url(url).parse(RemoteTestModel.class);
+        RemoteTestModel model = W4Parser.url(url, RemoteTestModel.class).get();
 
         LOG.info("Remote result: {}", model);
     }
@@ -116,7 +116,6 @@ public class ParserTest {
         String url1 = "https://habrahabr.ru/users/";
         String url2 = "https://habrahabr.ru/hubs/";
         W4QueueResult result = W4Parser
-                                .queue()
                                     .url(url1, HabrahabrModel.class)
                                     .url(url2, HabrahabrModel.class)
                                     .onProgress((task, model) -> {

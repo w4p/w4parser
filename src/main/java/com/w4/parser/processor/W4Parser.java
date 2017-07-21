@@ -4,6 +4,7 @@ import com.w4.parser.adapters.TypeAdapters;
 import com.w4.parser.annotations.W4ParserOption;
 import com.w4.parser.annotations.W4RegExp;
 import com.w4.parser.annotations.W4Xpath;
+import com.w4.parser.client.W4QueueResult;
 import com.w4.parser.client.queue.W4Queue;
 import com.w4.parser.client.W4Request;
 import com.w4.parser.client.W4Response;
@@ -34,9 +35,9 @@ public class W4Parser {
         return W4Request.url(url);
     }
 
-    public static <T> T url(String url, Class<T> clazz) {
-        W4Request request = W4Request.url(url);
-        return request.parse(clazz);
+    public static <T> W4Queue url(String url, Class<T> clazz) {
+        W4Queue queue = new W4Queue();
+        return queue.url(url, clazz);
     }
 
     public static W4Response data(String html) {

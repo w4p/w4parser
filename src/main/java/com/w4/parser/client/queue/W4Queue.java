@@ -88,6 +88,11 @@ public class W4Queue {
         CompletableFuture.runAsync(() -> w4QueuePromise.complete(run()));
     }
 
+    public <T extends Object> T get() {
+        W4QueueResult<T> result = run();
+        return result.getFirst();
+    }
+
     public void runTaskList(CountDownLatch latch) {
         W4QueueTask task;
         while ((task = getTask()) != null && activeThreads < maxThreads) {
