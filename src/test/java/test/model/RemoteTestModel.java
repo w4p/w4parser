@@ -1,13 +1,14 @@
 package test.model;
 
-import com.w4.parser.annotations.W4Client;
+import com.w4.parser.annotations.W4ParserOption;
 import com.w4.parser.annotations.W4RegExp;
 import com.w4.parser.annotations.W4Xpath;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @W4Xpath(followURL = "//a")
-//@W4Client(timeout = 15000)
+@W4ParserOption(timeout = 15000, timeUnit = TimeUnit.MILLISECONDS)
 public class RemoteTestModel {
 
     @W4Xpath(path = "/h1[class=\"bcrs\"]//b")

@@ -51,8 +51,8 @@ public class W4Queue {
     public W4QueueResult run() {
         CountDownLatch latch = new CountDownLatch(this.requestList.size());
         for (W4QueueTask task : this.requestList) {
-            if (task.getUrl() != null) {
-                W4Parser.url(task.getUrl()).parseAsync(task.getClazz(), model -> {
+            if (task.getW4Request() != null) {
+                task.getW4Request().parseAsync(task.getClazz(), model -> {
                     int idx = this.index.get(task.hashCode());
                     this.result.addResult(idx, model);
                     if (this.progressPromise != null) {
@@ -61,7 +61,7 @@ public class W4Queue {
                     latch.countDown();
                 });
             } else {
-                W4Parser.data(task.getData()).parseAsync(task.getClazz(), model -> {
+                task.getW4Response().parseAsync(task.getClazz(), model -> {
                     int idx = this.index.get(task.hashCode());
                     this.result.addResult(idx, model);
                     if (this.progressPromise != null) {

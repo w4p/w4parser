@@ -1,6 +1,7 @@
 package com.w4.parser.processor;
 
 import com.w4.parser.adapters.TypeAdapters;
+import com.w4.parser.annotations.W4ParserOption;
 import com.w4.parser.annotations.W4RegExp;
 import com.w4.parser.annotations.W4Xpath;
 import com.w4.parser.client.queue.W4Queue;
@@ -19,6 +20,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class W4Parser {
     private static final Logger LOG = LoggerFactory.getLogger(W4Parser.class);
@@ -65,6 +68,7 @@ public class W4Parser {
 
     public static <T> T parse(String html, Class<T> clazz) throws W4ParserException {
         T model = null;
+//        final CompletableFuture<T> future = new CompletableFuture<>();
         try {
             model = clazz.newInstance();
             Element document = Jsoup.parse(html);
@@ -77,7 +81,15 @@ public class W4Parser {
                 }
             }
 
-            parse(document, model);
+            long stopTime;
+            if (clazz.isAnnotationPresent(W4ParserOption.class)) {
+                W4ParserOption w4parserOption = clazz.getAnnotation(W4ParserOption.class);
+                stopTime = System.currentTimeMillis() + w4parserOption.timeUnit().toMillis(w4parserOption.timeout());
+            } else {
+                stopTime = Long.MAX_VALUE;
+            }
+
+            parse(document, model, stopTime);
 
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException e) {
             throw new W4ParserException(e);
@@ -86,7 +98,7 @@ public class W4Parser {
         return model;
     }
 
-    private static <T> T parse(Element element, T model)
+    private static <T> T parse(Element element, T model, long stopTime)
             throws IllegalAccessException, InstantiationException, NoSuchMethodException {
         //Fields
         Class clazz = model.getClass();
@@ -132,13 +144,13 @@ public class W4Parser {
                                     if (w4Xpath.maxCount() != 0 && w4Xpath.maxCount() <= cnt) {
                                         break;
                                     }
-                                    collection.add(getData(it.next(), w4JPath, subTypeClass));
+                                    collection.add(getData(it.next(), w4JPath, subTypeClass, stopTime));
                                     cnt++;
                                 }
 //                                field.set(model, getCollection(elements, w4Xpath, w4JPath, field.getType()));
                             } else {
                                 //bindData
-                                Object val = getData(elements.first(), w4JPath, field.getType());
+                                Object val = getData(elements.first(), w4JPath, field.getType(), stopTime);
                                 if (val != null) {
                                     field.set(model, val);
                                 }
@@ -191,7 +203,7 @@ public class W4Parser {
 //        return collection;
 //    }
 
-    private static <T> T getData(Element element, W4JPath w4JPath, Class<T> clazz)
+    private static <T> T getData(Element element, W4JPath w4JPath, Class<T> clazz, long stopTime)
             throws IllegalAccessException, NoSuchMethodException {
         if (TypeAdapters.isContainType(clazz)) {
             String data = (w4JPath.getAttr() != null && !w4JPath.getAttr().isEmpty())
@@ -213,7 +225,7 @@ public class W4Parser {
         }
         try {
             T value = clazz.newInstance();
-            return parse(element, value);
+            return parse(element, value, stopTime);
         } catch (InstantiationException e) {
             throw new W4ParserException("Class " + clazz.getName() + " doesn't contain default contructor");
         }
