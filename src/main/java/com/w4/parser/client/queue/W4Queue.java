@@ -7,12 +7,12 @@ import com.w4.parser.client.promise.W4QueueProgressPromise;
 import com.w4.parser.client.promise.W4QueuePromise;
 import com.w4.parser.client.promise.W4QueueTaskPromise;
 import com.w4.parser.processor.W4Parser;
-import lombok.Getter;
-import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
@@ -29,6 +29,7 @@ public class W4Queue {
 
     private int maxThreads = 10;
     private int activeThreads = 0;
+    CountDownLatch latch;
 
 
 
@@ -37,7 +38,7 @@ public class W4Queue {
     private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
 
     public synchronized W4Queue data(String data, Class clazz) {
-        W4QueueTask task = new W4QueueTask(clazz).setData(data);
+        W4QueueTask task = new W4QueueTask(clazz).setData(data, this);
         addQueue(task);
         this.lastTask = task;
         return this;
@@ -71,8 +72,11 @@ public class W4Queue {
         return this;
     }
 
-    public void addInternalQueue(W4QueueTask task) {
+    public W4Queue addInternalQueue(W4QueueTask task) {
+        task.getW4Request().setQueue(this);
         this.requestList.add(task);
+        runTaskList(this.latch);
+        return this;
     }
 
     private void addQueue(W4QueueTask task) {
@@ -82,7 +86,7 @@ public class W4Queue {
     }
 
     public W4QueueResult run() {
-        CountDownLatch latch = new CountDownLatch(this.requestList.size());
+        latch = new CountDownLatch(this.requestList.size());
         runTaskList(latch);
         try {
             latch.await(this.timeout, this.timeUnit);
@@ -127,17 +131,21 @@ public class W4Queue {
     private void runTask(CountDownLatch latch, W4QueueTask task, W4QueueTaskPromise taskPromise) {
 
         W4ParsePromise parsePromise = (model) -> {
+            if (task.getParsePromise() != null) {
+                task.getParsePromise().complete(model);
+            }
             Integer idx = this.index.get(task.hashCode());
             if (idx != null) {
                 this.result.addResult(idx, model);
-            }
-            if (this.progressPromise != null) {
-                this.progressPromise.onProgress(task, model);
-            }
-            threadMonitor(-1);
-            latch.countDown();
 
-            taskPromise.taskCompleted();
+                if (this.progressPromise != null) {
+                    this.progressPromise.onProgress(task, model);
+                }
+                threadMonitor(-1);
+                latch.countDown();
+
+                taskPromise.taskCompleted();
+            }
         };
 
         if (task.getW4Request() != null) {

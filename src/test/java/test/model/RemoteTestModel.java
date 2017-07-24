@@ -3,10 +3,12 @@ package test.model;
 import com.w4.parser.annotations.W4Fetch;
 import com.w4.parser.annotations.W4RegExp;
 import com.w4.parser.annotations.W4Xpath;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@Getter
 @W4Fetch(timeout = 100, timeUnit = TimeUnit.MILLISECONDS)
 public class RemoteTestModel {
 
@@ -16,11 +18,15 @@ public class RemoteTestModel {
     @W4Xpath(path = "//*[class*=\"sresult\"]")
     private List<Item> items;
 
+    @W4Fetch(url = "https://habrahabr.ru/users/")
+    private HabrahabrModel habrahabrModel;
+
     @Override
     public String toString() {
         return "RemoteTestModel{" +
                 "category='" + category + '\'' +
                 ", items=" + items +
+                ", habrahabrModel=" + habrahabrModel +
                 '}';
     }
 

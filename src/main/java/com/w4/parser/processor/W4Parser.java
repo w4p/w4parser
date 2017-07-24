@@ -4,6 +4,7 @@ import com.w4.parser.adapters.TypeAdapters;
 import com.w4.parser.annotations.W4Fetch;
 import com.w4.parser.annotations.W4RegExp;
 import com.w4.parser.annotations.W4Xpath;
+import com.w4.parser.client.promise.W4QueueCompletePromise;
 import com.w4.parser.client.queue.W4Queue;
 import com.w4.parser.client.W4Request;
 import com.w4.parser.client.W4Response;
@@ -29,26 +30,26 @@ public class W4Parser {
         return new W4Queue();
     }
 
-    public static W4Request url(String url) {
-        return W4Request.url(url);
-    }
+//    public static W4Request url(String url) {
+//        return W4Request.url(url);
+//    }
 
     public static <T> W4Queue url(String url, Class<T> clazz) {
         W4Queue queue = new W4Queue();
         return queue.url(url, clazz);
     }
 
-    public static W4Response data(String html) {
-        W4Response response = new W4Response();
-        response.setContent(html);
-        return response;
+    public static <T> W4Queue data(String html, Class<T> clazz) {
+        W4Queue queue = new W4Queue();
+        return queue.data(html, clazz);
     }
 
-    public static <T> T data(String html, Class<T> clazz) {
-        W4Response response = new W4Response();
-        response.setContent(html);
-        return response.parse(clazz);
-    }
+//    public static <T> T data(String html, Class<T> clazz) {
+//        W4Queue queue = new W4Queue();
+//        W4Response response = new W4Response(new W4Request(queue));
+//        response.setContent(html);
+//        return response.parse(clazz);
+//    }
 
     public static <T> CompletableFuture<T> parseAsync(String html, Class<T> clazz, W4Queue queue) throws W4ParserException {
         final CompletableFuture<T> future = new CompletableFuture<>();
@@ -58,7 +59,8 @@ public class W4Parser {
         return future;
     }
 
-    public static <T> void parseAsync(String html, Class<T> clazz, W4Queue queue, W4ParsePromise promise) throws W4ParserException {
+    public static <T> void parseAsync(String html, Class<T> clazz, W4Queue queue, W4ParsePromise promise)
+            throws W4ParserException {
         CompletableFuture.runAsync(() -> {
             T model = parse(html, clazz, queue);
             promise.complete(model);
@@ -111,6 +113,7 @@ public class W4Parser {
         Class clazz = model.getClass();
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
+            field.setAccessible(true);
             Class<?> genericClass = getGenericClass(field);
             if (field.isAnnotationPresent(W4Xpath.class)) {
                 LOG.debug("Found annotation in {} on field: {}", clazz.getCanonicalName(), field.getName());
@@ -132,9 +135,6 @@ public class W4Parser {
 
                         if (elements.size() > 0) {
                             //FOUND DATA
-                            field.setAccessible(true);
-
-
                             if (isCollection(field)) {
                                 //IT is collection
                                 Collection collection;
@@ -174,7 +174,20 @@ public class W4Parser {
                     //Hardcoded URL
                     for (String url : w4Fetch.url()) {
                         W4QueueTask task = new W4QueueTask(genericClass).setUrl(url);
-                        task.setWrapModel(field.get(model));
+                        final Object fieldModel = field.get(model);
+//                        task.setWrapModel();
+                        W4ParsePromise<?> completePromise = (remoteModel) -> {
+                            if (isCollection(field)) {
+                                ((Collection) fieldModel).add(remoteModel);
+                            } else {
+                                try {
+                                    field.set(model, genericClass.cast(remoteModel));
+                                } catch (IllegalAccessException e) {
+                                    LOG.error(e.getMessage());
+                                }
+                            }
+                        };
+                        task.setParsePromise(completePromise);
                         w4ParserTask.getQueue().addInternalQueue(task);
                     }
                 }

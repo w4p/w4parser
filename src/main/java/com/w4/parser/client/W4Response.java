@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Getter
 @Setter
-@NoArgsConstructor
+//@NoArgsConstructor
 public class W4Response {
     private String url;
     private int responseCode;
