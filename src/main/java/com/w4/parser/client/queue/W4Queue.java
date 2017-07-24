@@ -71,6 +71,10 @@ public class W4Queue {
         return this;
     }
 
+    public void addInternalQueue(W4QueueTask task) {
+        this.requestList.add(task);
+    }
+
     private void addQueue(W4QueueTask task) {
         requestList.add(task);
         result.add(null);
@@ -123,8 +127,10 @@ public class W4Queue {
     private void runTask(CountDownLatch latch, W4QueueTask task, W4QueueTaskPromise taskPromise) {
 
         W4ParsePromise parsePromise = (model) -> {
-            int idx = this.index.get(task.hashCode());
-            this.result.addResult(idx, model);
+            Integer idx = this.index.get(task.hashCode());
+            if (idx != null) {
+                this.result.addResult(idx, model);
+            }
             if (this.progressPromise != null) {
                 this.progressPromise.onProgress(task, model);
             }

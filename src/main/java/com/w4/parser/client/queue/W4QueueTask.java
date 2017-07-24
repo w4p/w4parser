@@ -2,6 +2,8 @@ package com.w4.parser.client.queue;
 
 import com.w4.parser.client.W4Request;
 import com.w4.parser.client.W4Response;
+import com.w4.parser.client.promise.W4QueueCompletePromise;
+import com.w4.parser.client.promise.W4QueueTaskPromise;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +16,9 @@ public class W4QueueTask<T> {
     private W4Response w4Response;
 
     private Class<T> clazz;
+    private Object wrapModel;
+
+    private W4QueueCompletePromise<T> completeEvent;
 
     public W4QueueTask(Class<T> clazz) {
         this.clazz = clazz;

@@ -142,13 +142,13 @@ public class W4Request implements HasQueue {
         });
     }
 
-    public <T> T parse(Class<T> clazz) {
-        W4Response response = fetch();
-        return response.parse(clazz);
-    }
+//    public <T> T parse(Class<T> clazz) {
+//        W4Response response = fetch();
+//        return response.parse(clazz);
+//    }
 
     public <T> void parseAsync(Class<T> clazz, W4ParsePromise<T> promise) {
-        fetchAsync(response -> promise.complete(response.parse(clazz)));
+        fetchAsync(response -> response.parseAsync(clazz, promise));
     }
 
 

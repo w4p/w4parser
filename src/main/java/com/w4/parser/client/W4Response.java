@@ -27,10 +27,10 @@ public class W4Response {
     }
 
     public <T> T parse(Class<T> clazz) {
-        return W4Parser.parse(this.content, clazz);
+        return W4Parser.parse(this.content, clazz, this.request.getQueue());
     }
 
     public <T> void parseAsync(Class<T> clazz, W4ParsePromise<T> promise) {
-        W4Parser.parseAsync(this.content, clazz, promise);
+        W4Parser.parseAsync(this.content, clazz, this.request.getQueue(), promise);
     }
 }
