@@ -15,5 +15,5 @@ public @interface W4Xpath {
     int maxCount() default  0;
 
     boolean html() default false;
-    boolean xml() default false;
+    boolean useXMLParser() default true;
 }

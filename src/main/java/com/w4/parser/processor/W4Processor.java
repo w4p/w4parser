@@ -74,14 +74,21 @@ public class W4Processor {
         W4QueueTask task = w4Response.getQueueTask();
         Class<T> clazz = task.getClazz();
         try {
-            Element document = Jsoup.parse(w4Response.getContent(), "", Parser.xmlParser());
-
+            Element document = null;
             if (clazz.isAnnotationPresent(W4Xpath.class)) {
                 W4Xpath w4Xpath = clazz.getAnnotation(W4Xpath.class);
+                if (!w4Xpath.useXMLParser()) {
+                    document = Jsoup.parse(w4Response.getContent());
+                } else {
+                    document = Jsoup.parse(w4Response.getContent(), "", Parser.xmlParser());
+                }
+
                 if (w4Xpath.path().length > 0 && !w4Xpath.path()[0].isEmpty()) {
                     W4JPath w4JPath = new W4JPath(w4Xpath, w4Xpath.path()[0]);
                     document = document.select(w4JPath.getPath()).first();
                 }
+            } else {
+                document = Jsoup.parse(w4Response.getContent(), "", Parser.xmlParser());
             }
 
             if (clazz.isAnnotationPresent(W4Fetch.class)) {
