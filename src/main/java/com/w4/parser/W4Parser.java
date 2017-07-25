@@ -19,15 +19,19 @@ public class W4Parser {
             W4Fetch w4Xpath = clazz.getAnnotation(W4Fetch.class);
             if (w4Xpath.url().length > 0 &&  !w4Xpath.url()[0].isEmpty()) {
                 String url = w4Xpath.url()[0];
-                return parse(url, clazz);
+                return url(url, clazz);
             }
         }
         LOG.warn("W4Fetch url() is empty. Please add W4Fetch annotation to class {}", clazz.getCanonicalName());
         return null;
     }
 
-    public static <T> W4Queue parse(String url, Class<T> clazz) {
+    public static <T> W4Queue url(String url, Class<T> clazz) {
         return W4Processor.url(url, clazz);
+    }
+
+    public static <T> W4Queue data(String html, Class<T> clazz) {
+        return W4Processor.data(html, clazz);
     }
 
     public static W4Queue queue() {
