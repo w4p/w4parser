@@ -43,7 +43,7 @@ public class W4JPath {
         return "W4JPath{" +
                 "path='" + path + '\'' +
                 ", attr='" + attr + '\'' +
-                ", xpath='" + xpath + '\'' +
+                ", href='" + xpath + '\'' +
                 '}';
     }
 }

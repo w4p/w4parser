@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -200,10 +199,10 @@ public class W4Processor {
                             }
                         }
 
-                        //Parse links by xpath
-                        if (w4Fetch.xpath().length > 0) {
+                        //Parse links by href
+                        if (w4Fetch.href().length > 0) {
                             int cnt = 0;
-                            for (W4Xpath w4XpathSub : w4Fetch.xpath()) {
+                            for (W4Xpath w4XpathSub : w4Fetch.href()) {
                                 for (int i = 0; i < w4XpathSub.path().length; i++) {
                                     if (w4Fetch.maxFetch() != 0 && w4Fetch.maxFetch() <= cnt) {
                                         break;

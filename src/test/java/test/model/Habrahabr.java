@@ -14,7 +14,7 @@ public class Habrahabr {
     @W4Fetch(url = "https://habrahabr.ru/users/wbb/")
     private HabrahabrUser wbbUser;
 
-    @W4Fetch(xpath = @W4Xpath(path = "//a[class=\"post__title_link\"]/@href"), maxFetch = 5)
+    @W4Fetch(href = @W4Xpath(path = "//a[class=\"post__title_link\"]/@href"), maxFetch = 5)
     private List<HabrahabrArticle> articleList;
 
 
@@ -30,7 +30,7 @@ public class Habrahabr {
         @W4Xpath(path = "//*[class=\"post__title\"]")
         private String title;
 
-        @W4Fetch(xpath = @W4Xpath(path = {"//a[class=\"author-info__nickname\"]/@href", "//a[class=\"page-header__info-title\"]/@href"}))
+        @W4Fetch(href = @W4Xpath(path = {"//a[class=\"author-info__nickname\"]/@href", "//a[class=\"page-header__info-title\"]/@href"}))
         private HabrahabrUser author;
 
         @W4Xpath(path = "//div[class*=\"post__body_full\"]", html = false)
