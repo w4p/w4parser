@@ -19,9 +19,7 @@ public class W4Parser {
             W4Fetch w4Xpath = clazz.getAnnotation(W4Fetch.class);
             if (w4Xpath.url().length > 0 &&  !w4Xpath.url()[0].isEmpty()) {
                 String url = w4Xpath.url()[0];
-                W4Processor.url(url, clazz).get((T model) -> {
-                    promise.complete(model);
-                });
+                parse(url, clazz, promise);
                 return;
             }
         }
@@ -39,5 +37,11 @@ public class W4Parser {
             LOG.error(e.getMessage());
             return null;
         }
+    }
+
+    public static <T> void parse(String url, Class<T> clazz, W4ParsePromise promise) {
+        W4Processor.url(url, clazz).get((T model) -> {
+            promise.complete(model);
+        });
     }
 }
