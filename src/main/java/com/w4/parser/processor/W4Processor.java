@@ -133,9 +133,7 @@ public class W4Processor {
 
                                 if (isCollection(field)) {
                                     //IT is collection
-                                    Collection collection = getCollection(field);
-                                    field.set(parentModel, collection);
-
+                                    final Collection collection = getCollection(field, parentModel);
                                     int cnt = 0;
                                     for (Iterator<Element> it = elements.iterator(); it.hasNext(); ) {
                                         if (w4Xpath.maxCount() != 0 && w4Xpath.maxCount() <= cnt) {
@@ -170,10 +168,7 @@ public class W4Processor {
 //                //Fetch remote data
                     W4Fetch w4Fetch = field.getAnnotation(W4Fetch.class);
                     if (task.getDepth() < w4Fetch.maxDepth()) {
-                        final Collection collection = getCollection(field);
-                        if (isCollection(field)) {
-                            field.set(parentModel, collection);
-                        }
+                        final Collection collection = getCollection(field, parentModel);
                         if (w4Fetch.url().length > 0 && !w4Fetch.url()[0].isEmpty()) {
 //                    //Hardcoded URL
                             int cnt = 0;
@@ -251,13 +246,21 @@ public class W4Processor {
         }
     }
 
-    private static Collection getCollection(Field field) {
+    private static Collection getCollection(Field field, Object parentModel) {
         Collection collection = null;
         if (isCollection(field)) {
-            if (Set.class.isAssignableFrom(field.getType())) {
-                collection = new HashSet();
-            } else {
-                collection = new ArrayList();
+            try {
+                collection = (Collection) field.get(parentModel);
+                if (collection == null) {
+                    if (Set.class.isAssignableFrom(field.getType())) {
+                        collection = new HashSet();
+                    } else {
+                        collection = new ArrayList();
+                    }
+                    field.set(parentModel, collection);
+                }
+            } catch (IllegalAccessException e) {
+                LOG.error(e.getMessage());
             }
         }
         return collection;
