@@ -34,7 +34,7 @@ public class W4Queue {
 
 
     private W4QueueProgressPromise progressPromise;
-    private long timeout = 60000 * 10;
+    private long timeout = 60000 * 60 * 24;
     private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
 
     public synchronized W4Queue data(String data, Class clazz) {

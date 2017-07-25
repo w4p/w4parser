@@ -201,9 +201,9 @@ public class W4Processor {
                         }
 
                         //Parse links by xpath
-                        if (w4Fetch.path().length > 0) {
+                        if (w4Fetch.xpath().length > 0) {
                             int cnt = 0;
-                            for (W4Xpath w4XpathSub : w4Fetch.path()) {
+                            for (W4Xpath w4XpathSub : w4Fetch.xpath()) {
                                 for (int i = 0; i < w4XpathSub.path().length; i++) {
                                     if (w4Fetch.maxFetch() != 0 && w4Fetch.maxFetch() <= cnt) {
                                         break;
@@ -293,7 +293,8 @@ public class W4Processor {
             throws IllegalAccessException, NoSuchMethodException {
         if (TypeAdapters.isContainType(clazz)) {
             String data = (w4JPath.getAttr() != null && !w4JPath.getAttr().isEmpty())
-                    ? element.attr(w4JPath.getAttr()).trim():element.text().trim();
+                    ? element.attr(w4JPath.getAttr()).trim()
+                        : ((w4JPath.getXpath().html()) ? element.html() : element.text()).trim();
             if (w4JPath.getXpath().postProcess().length > 0) {
                 for (W4RegExp w4RegExp : w4JPath.getXpath().postProcess()) {
                     data = data.replaceAll(w4RegExp.search(), w4RegExp.replace());
@@ -321,10 +322,6 @@ public class W4Processor {
 
     private static String normalizeURL(W4Response w4Response, String path) {
         URI uri = w4Response.getQueueTask().getW4Request().getRequest().getURI();
-        try {
-            return new URI(uri.getScheme(), uri.getHost(), path, null).toASCIIString();
-        } catch (URISyntaxException e) {
-            return null;
-        }
+        return uri.resolve(path).toASCIIString();
     }
 }

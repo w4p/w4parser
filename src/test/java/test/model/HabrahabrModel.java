@@ -12,7 +12,7 @@ public class HabrahabrModel {
     @W4Xpath(path = "a[class*=\"nav-links__item-link_current\"]")
     private String title;
 
-    @W4Fetch(path = @W4Xpath(path = "//a[class*=\"nav-links__item-link\"]/@href"), maxDepth = 2, maxFetch = 2)
+    @W4Fetch(xpath = @W4Xpath(path = "//a[class*=\"nav-links__item-link\"]/@href"), maxDepth = 2, maxFetch = 2)
     private List<HabrahabrModel> habrahabrModelList;
 
     @Override

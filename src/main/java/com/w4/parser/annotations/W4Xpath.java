@@ -13,4 +13,6 @@ public @interface W4Xpath {
     String defaultValue() default "";
     W4RegExp[] postProcess() default {};
     int maxCount() default  0;
+
+    boolean html() default false;
 }

@@ -1,6 +1,7 @@
 package test;
 
 import com.google.gson.Gson;
+import com.w4.parser.W4Parser;
 import com.w4.parser.client.W4QueueResult;
 import com.w4.parser.processor.W4Processor;
 import org.eclipse.jetty.http.HttpHeader;
@@ -8,6 +9,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import test.data.TestHtmlData;
+import test.model.Habrahabr;
 import test.model.HabrahabrModel;
 import test.model.RemoteTestModel;
 import test.model.TestPageModel;
@@ -26,6 +28,20 @@ public class ParserTest {
     private static final Logger LOG = LoggerFactory.getLogger(ParserTest.class);
 
     @Test
+    public void parseClass() {
+        Habrahabr habrahabr = W4Parser.parse(Habrahabr.class);
+        LOG.info("Result: {}", new Gson().toJson(habrahabr));
+
+        assertNotEquals(habrahabr, null);
+    }
+
+
+
+
+    ////////////////////////////////////
+
+
+//    @Test
     public void testParser() {
         TestPageModel model = W4Processor.data(TestHtmlData.htmlReviewData(), TestPageModel.class).get();
 
@@ -58,7 +74,7 @@ public class ParserTest {
 
     }
 
-    @Test
+//    @Test
     public void testParserAsync() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
         W4Processor.data(TestHtmlData.htmlReviewData(), TestPageModel.class).get((TestPageModel model) -> {
@@ -101,7 +117,7 @@ public class ParserTest {
         LOG.info("Remote result: {}", model);
     }
 
-    @Test
+//    @Test
     public void remoteAsync() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
         final TestResult testResult = new TestResult();
@@ -124,7 +140,7 @@ public class ParserTest {
         LOG.info("Remote async parse test passed.");
     }
 
-    @Test
+//    @Test
     public void queue() {
         String url1 = "https://habrahabr.ru/users/";
         String url2 = "https://habrahabr.ru/hubs/";
