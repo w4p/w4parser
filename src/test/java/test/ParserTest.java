@@ -1,8 +1,8 @@
 package test;
 
+import com.google.gson.Gson;
 import com.w4.parser.client.W4QueueResult;
-import com.w4.parser.client.promise.W4ParsePromise;
-import com.w4.parser.processor.W4Parser;
+import com.w4.parser.processor.W4Processor;
 import org.eclipse.jetty.http.HttpHeader;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -11,8 +11,10 @@ import test.data.TestHtmlData;
 import test.model.HabrahabrModel;
 import test.model.RemoteTestModel;
 import test.model.TestPageModel;
+import test.result.TestResult;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -25,7 +27,7 @@ public class ParserTest {
 
     @Test
     public void testParser() {
-        TestPageModel model = W4Parser.data(TestHtmlData.htmlReviewData(), TestPageModel.class).get();
+        TestPageModel model = W4Processor.data(TestHtmlData.htmlReviewData(), TestPageModel.class).get();
 
         if (model == null) {
             fail( "Something wrong with parser. TestPageModel is null");
@@ -56,45 +58,45 @@ public class ParserTest {
 
     }
 
-//    @Test
-//    public void testParserAsync() throws InterruptedException {
-//        CountDownLatch latch = new CountDownLatch(1);
-//        W4Parser.data(TestHtmlData.htmlReviewData(), TestPageModel.class).get((model) -> {
-//            if (model == null) {
-//                fail( "Something wrong with parser. TestPageModel is null");
-//            }
-//
-//            assertEquals(model.getTitle(), "Test");
-//            assertEquals(model.getReview().getAuthor(), "Author");
-//            assertEquals(model.getReview().getComment(), "Comment text");
-//            assertEquals(model.getLinks().size(), 5);
-//
-//            assertEquals(model.getLinks().get(0).getText(), "A link 1");
-//            assertEquals(model.getLinks().get(1).getText(), "A link 2");
-//            assertEquals(model.getLinks().get(2).getText(), "A link 3");
-//            assertEquals(model.getLinks().get(3).getText(), "A link 4");
-//            assertEquals(model.getLinks().get(4).getText(), "A link 5");
-//
-//            assertEquals(model.getNotfoundTitle(), null);
-//            assertEquals(model.getNotfoundReview(), null);
-//
-//            assertEquals(model.getReview().isEnabled(), true);
-//            assertEquals(model.getReview().getRating(), 4);
-//            assertEquals(model.getReview().getFloatVal(), 0.0f, 0f);
-//            assertEquals(model.getReview().getFloatValValid(), 4.007f, 0f);
-//
-//            LOG.debug("Result: {}", model);
-//            latch.countDown();
-//        });
-//        LOG.debug("Waiting for parsing result.");
-//        latch.await();
-//        LOG.info("Async parsing test passed.");
-//    }
+    @Test
+    public void testParserAsync() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        W4Processor.data(TestHtmlData.htmlReviewData(), TestPageModel.class).get((TestPageModel model) -> {
+            if (model == null) {
+                fail( "Something wrong with parser. TestPageModel is null");
+            }
+
+            assertEquals(model.getTitle(), "Test");
+            assertEquals(model.getReview().getAuthor(), "Author");
+            assertEquals(model.getReview().getComment(), "Comment text");
+            assertEquals(model.getLinks().size(), 5);
+
+            assertEquals(model.getLinks().get(0).getText(), "A link 1");
+            assertEquals(model.getLinks().get(1).getText(), "A link 2");
+            assertEquals(model.getLinks().get(2).getText(), "A link 3");
+            assertEquals(model.getLinks().get(3).getText(), "A link 4");
+            assertEquals(model.getLinks().get(4).getText(), "A link 5");
+
+            assertEquals(model.getNotfoundTitle(), null);
+            assertEquals(model.getNotfoundReview(), null);
+
+            assertEquals(model.getReview().isEnabled(), true);
+            assertEquals(model.getReview().getRating(), 4);
+            assertEquals(model.getReview().getFloatVal(), 0.0f, 0f);
+            assertEquals(model.getReview().getFloatValValid(), 4.007f, 0f);
+
+            LOG.debug("Result: {}", model);
+            latch.countDown();
+        });
+        LOG.debug("Waiting for parsing result.");
+        latch.await();
+        LOG.info("Async parsing test passed.");
+    }
 
 //    @Test
     public void remoteSync() {
         String url = "https://www.ebay.com/sch/Cell-Phones-Smartphones-/9355/i.html";
-        RemoteTestModel model = W4Parser.url(url, RemoteTestModel.class).get();
+        RemoteTestModel model = W4Processor.url(url, RemoteTestModel.class).get();
 
         LOG.info("Remote result: {}", model);
     }
@@ -102,40 +104,40 @@ public class ParserTest {
     @Test
     public void remoteAsync() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
+        final TestResult testResult = new TestResult();
+//        final TestResult<List> testResult2 = new TestResult();
         String url = "https://www.ebay.com/sch/Cell-Phones-Smartphones-/9355/i.html";
-        W4Parser.url(url, RemoteTestModel.class).run((result -> {
+        W4Processor.url(url, RemoteTestModel.class).run((result -> {
             RemoteTestModel remoteTestModel = (RemoteTestModel) result.getFirst();
             LOG.info("Fetched model by async method: {}", remoteTestModel);
-            assertNotEquals(remoteTestModel.getHabrahabrModel(), null);
+            testResult.setResult(remoteTestModel.getHabrahabrModel());
+//            testResult2.setResult(remoteTestModel.getHabrahabrModelList());
             latch.countDown();
         }));
 
-//        W4Parser.url(url).parseAsync(RemoteTestModel.class, (remoteTestModel -> {
-//            LOG.info("Fetched model by async method: {}", remoteTestModel);
-//            assertNotEquals(remoteTestModel.getHabrahabrModel(), null);
-//            latch.countDown();
-//        }));
-
         LOG.debug("Async request sended. Wait for result.");
         latch.await();
+        assertNotEquals(testResult.getResult(), null);
+//        assertNotEquals(testResult2.getResult(), null);
+//        assertEquals(testResult2.getResult().size(), 2);
         LOG.info("Remote async parse test passed.");
     }
 
-//    @Test
+    @Test
     public void queue() {
         String url1 = "https://habrahabr.ru/users/";
         String url2 = "https://habrahabr.ru/hubs/";
-        W4QueueResult result = W4Parser
+        W4QueueResult result = W4Processor
                                     .url(url1, HabrahabrModel.class)
-                                    .url(url2, HabrahabrModel.class)
+//                                    .url(url2, HabrahabrModel.class)
                                     .onProgress((task, model) -> {
-                                        LOG.debug("Complete process: {}, model: {}", task.getUrl(), model);
+                                        LOG.debug("Complete process: {}, model: {}", task.getW4Request().getUrl(), model);
                                     })
                                 .run();
         LOG.debug("W4Queue result: {}", result);
         for (Iterator<HabrahabrModel> it = result.iterator(); it.hasNext();) {
             HabrahabrModel m = it.next();
-            LOG.debug("Res: {}", m.getTitle());
+            LOG.info("Res: {}", new Gson().toJson(m));
         }
 
         LOG.info("Queue test passed");
@@ -147,7 +149,7 @@ public class ParserTest {
         String url3 = "https://habrahabr.ru/companies/";
         String url4 = "https://www.ebay.com/sch/Cell-Phones-Smartphones-/9355/i.html";
 
-        W4Parser
+        W4Processor
                 .queue()
                     .threads(5)
                     .timeout(3000, TimeUnit.MILLISECONDS)
@@ -159,7 +161,7 @@ public class ParserTest {
                         .done()
                     .url(url3, HabrahabrModel.class)
                     .onProgress((task, model) -> {
-                        LOG.info("Complete process: {}, model: {}", task.getUrl(), model);
+                        LOG.info("Complete process: {}, model: {}", task.getW4Request().getUrl(), model);
                     })
                 .run((result -> {
                     latch.countDown();

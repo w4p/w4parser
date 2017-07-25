@@ -6,7 +6,7 @@ import com.w4.parser.client.promise.W4ParsePromise;
 import com.w4.parser.client.promise.W4QueueProgressPromise;
 import com.w4.parser.client.promise.W4QueuePromise;
 import com.w4.parser.client.promise.W4QueueTaskPromise;
-import com.w4.parser.processor.W4Parser;
+import com.w4.parser.processor.W4Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +19,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class W4Queue {
-    private static final Logger LOG = LoggerFactory.getLogger(W4Parser.class);
+    private static final Logger LOG = LoggerFactory.getLogger(W4Processor.class);
 
     private Queue<W4QueueTask> requestList = new ConcurrentLinkedQueue<>();
     private Map<Integer, Integer> index = new HashMap<>();
@@ -38,15 +38,14 @@ public class W4Queue {
     private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
 
     public synchronized W4Queue data(String data, Class clazz) {
-        W4QueueTask task = new W4QueueTask(clazz).setData(data, this);
+        W4QueueTask task = new W4QueueTask(clazz, this).setData(data);
         addQueue(task);
         this.lastTask = task;
         return this;
     }
 
     public synchronized W4Queue url(String url, Class clazz) {
-        W4QueueTask task = new W4QueueTask(clazz).setUrl(url);
-        task.getW4Request().setQueue(this);
+        W4QueueTask task = new W4QueueTask(clazz, this).setUrl(url);
         addQueue(task);
         this.lastTask = task;
         return this;
@@ -64,7 +63,7 @@ public class W4Queue {
     }
 
     public W4Request setup() {
-        return (this.lastTask.getW4Request() != null) ? this.lastTask.getW4Request(): (new W4Request(this));
+        return (this.lastTask.getW4Request() != null) ? this.lastTask.getW4Request(): (new W4Request(this.lastTask));
     }
 
     public W4Queue onProgress(W4QueueProgressPromise progressPromise) {
@@ -73,7 +72,6 @@ public class W4Queue {
     }
 
     public W4Queue addInternalQueue(W4QueueTask task) {
-        task.getW4Request().setQueue(this);
         this.requestList.add(task);
         runTaskList(this.latch);
         return this;
@@ -104,17 +102,16 @@ public class W4Queue {
         return result.getFirst();
     }
 
-    public <T extends Object> void get(W4ParsePromise w4ParsePromise) {
+    public <T extends Object> void get(W4ParsePromise<T> w4ParsePromise) {
         if (this.requestList.size() > 1) {
-            LOG.warn("W4Parser queue contains {} items, but used only first", this.requestList.size());
+            LOG.warn("W4Processor queue contains {} items, but used only first", this.requestList.size());
         }
-        run((result -> w4ParsePromise.complete(result.getFirst())));
+        run((result -> w4ParsePromise.complete((T) result.getFirst())));
     }
 
     public void runTaskList(CountDownLatch latch) {
         W4QueueTask task;
         while ((task = getTask()) != null && activeThreads < maxThreads) {
-            threadMonitor(1);
             runTask(latch, task, () -> {
                 runTaskList(latch);
             });
@@ -129,11 +126,8 @@ public class W4Queue {
     }
 
     private void runTask(CountDownLatch latch, W4QueueTask task, W4QueueTaskPromise taskPromise) {
-
+        final W4ParsePromise internalPromise = task.getTaskPromise();
         W4ParsePromise parsePromise = (model) -> {
-            if (task.getParsePromise() != null) {
-                task.getParsePromise().complete(model);
-            }
             Integer idx = this.index.get(task.hashCode());
             if (idx != null) {
                 this.result.addResult(idx, model);
@@ -141,23 +135,20 @@ public class W4Queue {
                 if (this.progressPromise != null) {
                     this.progressPromise.onProgress(task, model);
                 }
-                threadMonitor(-1);
                 latch.countDown();
-
-                taskPromise.taskCompleted();
             }
+
+            if (internalPromise != null) {
+                internalPromise.complete(model);
+            }
+            taskPromise.taskCompleted();
         };
 
-        if (task.getW4Request() != null) {
-            task.getW4Request().parseAsync(task.getClazz(), parsePromise);
-        } else {
-            task.getW4Response().parseAsync(task.getClazz(), parsePromise);
-        }
-
-
+        task.setTaskPromise(parsePromise);
+        task.run();
     }
 
-    private synchronized void threadMonitor(int add) {
+    public synchronized void threadMonitor(int add) {
         this.activeThreads += add;
     }
 }
