@@ -40,6 +40,14 @@ public class ParserTest {
         assertNotEquals(habrahabr, null);
     }
 
+    @Test
+    public void reutersClass() {
+        Reuters reuters = W4Parser.parse(Reuters.class).threads(5).get();
+        LOG.info("Result: {}", new Gson().toJson(reuters));
+
+        assertNotEquals(reuters, null);
+    }
+
 
 
 

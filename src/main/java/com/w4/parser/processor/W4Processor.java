@@ -12,6 +12,7 @@ import com.w4.parser.exceptions.W4ParserException;
 import com.w4.parser.jpath.W4JPath;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +74,7 @@ public class W4Processor {
         W4QueueTask task = w4Response.getQueueTask();
         Class<T> clazz = task.getClazz();
         try {
-            Element document = Jsoup.parse(w4Response.getContent());
+            Element document = Jsoup.parse(w4Response.getContent(), "", Parser.xmlParser());
 
             if (clazz.isAnnotationPresent(W4Xpath.class)) {
                 W4Xpath w4Xpath = clazz.getAnnotation(W4Xpath.class);
