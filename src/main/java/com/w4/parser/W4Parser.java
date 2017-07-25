@@ -29,4 +29,8 @@ public class W4Parser {
     public static <T> W4Queue parse(String url, Class<T> clazz) {
         return W4Processor.url(url, clazz);
     }
+
+    public static W4Queue queue() {
+        return new W4Queue();
+    }
 }

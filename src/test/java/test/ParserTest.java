@@ -26,7 +26,7 @@ public class ParserTest {
 
     @Test
     public void parseClass() {
-        Habrahabr habrahabr = W4Parser.parse(Habrahabr.class).get();
+        Habrahabr habrahabr = W4Parser.parse(Habrahabr.class).threads(5).get();
         LOG.info("Result: {}", new Gson().toJson(habrahabr));
 
         assertNotEquals(habrahabr, null);

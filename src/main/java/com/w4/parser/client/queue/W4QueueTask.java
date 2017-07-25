@@ -1,5 +1,6 @@
 package com.w4.parser.client.queue;
 
+import com.w4.parser.annotations.W4Xpath;
 import com.w4.parser.client.W4QueueResult;
 import com.w4.parser.client.W4Request;
 import com.w4.parser.client.W4Response;
@@ -23,7 +24,7 @@ public class W4QueueTask<T> {
     private W4Request w4Request;
     private W4Response w4Response;
 
-    private W4QueueTask parent; //used for interbal @W4Fetch
+//    private W4QueueTask parent; //used for interbal @W4Fetch
     private W4ParsePromise<T> taskPromise;
 
     private Class<T> clazz;
