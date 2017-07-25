@@ -9,10 +9,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import test.data.TestHtmlData;
-import test.model.Habrahabr;
-import test.model.HabrahabrModel;
-import test.model.RemoteTestModel;
-import test.model.TestPageModel;
+import test.model.*;
 import test.result.TestResult;
 
 import java.util.Iterator;
@@ -29,7 +26,15 @@ public class ParserTest {
 
     @Test
     public void parseClass() {
-        Habrahabr habrahabr = W4Parser.parse(Habrahabr.class);
+        Habrahabr habrahabr = W4Parser.parse(Habrahabr.class).get();
+        LOG.info("Result: {}", new Gson().toJson(habrahabr));
+
+        assertNotEquals(habrahabr, null);
+    }
+
+    @Test
+    public void parsePaginatio() {
+        HabraTitleList habrahabr = W4Parser.parse(HabraTitleList.class).get();
         LOG.info("Result: {}", new Gson().toJson(habrahabr));
 
         assertNotEquals(habrahabr, null);

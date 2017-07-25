@@ -14,34 +14,19 @@ import java.util.concurrent.ExecutionException;
 public class W4Parser {
     private static final Logger LOG = LoggerFactory.getLogger(W4Parser.class);
 
-    public static <T> void parse(Class<T> clazz, W4ParsePromise<T> promise) {
+    public static <T> W4Queue parse(Class<T> clazz) {
         if (clazz.isAnnotationPresent(W4Fetch.class)) {
             W4Fetch w4Xpath = clazz.getAnnotation(W4Fetch.class);
             if (w4Xpath.url().length > 0 &&  !w4Xpath.url()[0].isEmpty()) {
                 String url = w4Xpath.url()[0];
-                parse(url, clazz, promise);
-                return;
+                return parse(url, clazz);
             }
         }
         LOG.warn("W4Fetch url() is empty. Please add W4Fetch annotation to class {}", clazz.getCanonicalName());
+        return null;
     }
 
-    public static <T> T parse(Class<T> clazz) {
-        CompletableFuture<T> future = new CompletableFuture<>();
-        parse(clazz, (model) -> {
-            future.complete(model);
-        });
-        try {
-            return future.get();
-        } catch (InterruptedException | ExecutionException e) {
-            LOG.error(e.getMessage());
-            return null;
-        }
-    }
-
-    public static <T> void parse(String url, Class<T> clazz, W4ParsePromise promise) {
-        W4Processor.url(url, clazz).get((T model) -> {
-            promise.complete(model);
-        });
+    public static <T> W4Queue parse(String url, Class<T> clazz) {
+        return W4Processor.url(url, clazz);
     }
 }
