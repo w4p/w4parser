@@ -13,7 +13,4 @@ public @interface W4Xpath {
     String defaultValue() default "";
     W4RegExp[] postProcess() default {};
     int maxCount() default  0;
-
-    int timeout() default 60000 * 30;
-    TimeUnit timeUnit() default TimeUnit.MILLISECONDS;
 }

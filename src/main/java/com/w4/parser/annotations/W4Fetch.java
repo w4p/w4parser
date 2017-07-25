@@ -15,6 +15,6 @@ public @interface W4Fetch {
     int maxDepth() default 3;
     int maxFetch() default 10;
 
-    int timeout() default 30000;
+    int timeout() default 0;
     TimeUnit timeUnit() default TimeUnit.MILLISECONDS;
 }

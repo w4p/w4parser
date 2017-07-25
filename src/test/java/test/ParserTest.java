@@ -109,9 +109,10 @@ public class ParserTest {
         String url = "https://www.ebay.com/sch/Cell-Phones-Smartphones-/9355/i.html";
         W4Processor.url(url, RemoteTestModel.class).run((result -> {
             RemoteTestModel remoteTestModel = (RemoteTestModel) result.getFirst();
-            LOG.info("Fetched model by async method: {}", remoteTestModel);
-            testResult.setResult(remoteTestModel.getHabrahabrModel());
-//            testResult2.setResult(remoteTestModel.getHabrahabrModelList());
+            LOG.info("Fetched model by async method: {}", new Gson().toJson(remoteTestModel));
+            if (remoteTestModel != null) {
+                testResult.setResult(remoteTestModel.getHabrahabrModel());
+            }
             latch.countDown();
         }));
 

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Getter
-@W4Fetch(timeout = 100, timeUnit = TimeUnit.MILLISECONDS)
+@W4Fetch(timeout = 8000, timeUnit = TimeUnit.MILLISECONDS)
 public class RemoteTestModel {
 
     @W4Xpath(path = "/h1[class=\"bcrs\"]//b")
