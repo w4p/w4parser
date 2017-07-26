@@ -17,8 +17,8 @@ public class W4JPath {
 
     public W4JPath(W4Parse w4Parse, String xpath) {
         this.xpath = w4Parse;
-        xpath = xpath.replace("//", " ").trim();
-        String[] pathNodes = xpath.split("\\/");
+        String xpathValid = xpath.replace("//", " ").trim();
+        String[] pathNodes = xpathValid.split("\\/");
         StringBuilder sb = new StringBuilder();
         for (String s : pathNodes) {
             if (s != null || !s.isEmpty()) {

@@ -112,33 +112,6 @@ public class W4Processor {
     private static <T> void parse(Element element, Class<T> clazz,
                                   W4QueueTask<?> task, W4ParsePromise<T> promise)
             throws IllegalAccessException, InstantiationException, NoSuchMethodException {
-//        if (isCollection(clazz)) {
-//            T parentModel = clazz.newInstance();
-//            Collection collection = (Collection) parentModel;
-//            if (clazz.isAnnotationPresent(W4Parse.class)) {
-//                W4Parse w4Parse = clazz.getAnnotation(W4Parse.class);
-//                if (w4Parse.xpath().length > 0 && !w4Parse.xpath()[0].isEmpty()) {
-//                    for (String path : w4Parse.xpath()) {
-//                        W4JPath w4JPath = new W4JPath(w4Parse, path);
-//                        Elements elements = element.select(w4JPath.getPath());
-//                        if (elements.size() > 0) {
-//                            LOG.info("Generic class of list: {}", getClassE(collection));
-//                        }
-//                    }
-//                }
-//            }
-//        } else {
-//            T parentModel = clazz.newInstance();
-//            if (clazz.isAnnotationPresent(W4Parse.class)) {
-//                W4Parse w4Parse = clazz.getAnnotation(W4Parse.class);
-//                if (w4Parse.xpath().length > 0 && !w4Parse.xpath()[0].isEmpty()) {
-//                    W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.xpath()[0]);
-//                    element = element.select(w4JPath.getPath()).first();
-//                }
-//            }
-//            parse(element, parentModel, task, promise);
-//        }
-        //promise.complete(null);
         T parentModel = clazz.newInstance();
         if (clazz.isAnnotationPresent(W4Parse.class)) {
             W4Parse w4Parse = clazz.getAnnotation(W4Parse.class);

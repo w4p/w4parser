@@ -121,10 +121,8 @@ public class W4Request {
                 response.setUrl(request.getURI().toString());
                 try {
                     response.setResponseCode(result.getResponse().getStatus());
-                    if (result.isSucceeded()) {
-                        if (response.getResponseCode() == 200) {
-                            response.setContent(getContentAsString());
-                        }
+                    if (result.isSucceeded() && response.getResponseCode() == 200) {
+                        response.setContent(getContentAsString());
                     }
                     Throwable t = result.getResponseFailure();
                     if (t != null) {

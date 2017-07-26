@@ -13,7 +13,7 @@ public class HabraTitleList {
 
     @W4Parse
     @W4Fetch(href = @W4Parse(xpath = "//a[class*=\"toggle-menu__item-link_pagination\"]/@href"),
-             maxDepth = 2)
+             maxDepth = 2, maxFetch = 2)
     private List<TitleList> titleLists;
 
     @Getter

@@ -60,7 +60,7 @@ public class TypeAdapters {
         typeTokenCache.put(long.class, data -> new Long(data).longValue());
         typeTokenCache.put(float.class, data -> new Float(data).floatValue());
         typeTokenCache.put(double.class, data -> new Double(data).doubleValue());
-        typeTokenCache.put(boolean.class, data -> new Boolean(data).booleanValue());
+        typeTokenCache.put(boolean.class, data -> Boolean.valueOf(data).booleanValue());
         typeTokenCache.put(char.class, data -> data.charAt(0));
 
     }
