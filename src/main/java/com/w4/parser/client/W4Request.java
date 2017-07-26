@@ -1,8 +1,6 @@
 package com.w4.parser.client;
 
-import com.w4.parser.client.promise.W4ParsePromise;
 import com.w4.parser.client.promise.W4ResponsePromise;
-import com.w4.parser.client.queue.HasQueue;
 import com.w4.parser.client.queue.W4Queue;
 import com.w4.parser.client.queue.W4QueueTask;
 import lombok.Getter;

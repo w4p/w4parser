@@ -5,8 +5,8 @@ import com.w4.parser.annotations.W4Fetch;
 import com.w4.parser.annotations.W4Parse;
 import com.w4.parser.annotations.W4RegExp;
 import com.w4.parser.client.W4Response;
-import com.w4.parser.client.queue.W4Queue;
 import com.w4.parser.client.promise.W4ParsePromise;
+import com.w4.parser.client.queue.W4Queue;
 import com.w4.parser.client.queue.W4QueueTask;
 import com.w4.parser.exceptions.W4ParserException;
 import com.w4.parser.jpath.W4JPath;
@@ -298,20 +298,6 @@ public class W4Processor {
         } else {
             promise.complete(null);
         }
-    }
-
-    private static Collection makeCollection(Class clazz) {
-        Collection collection = null;
-        if (isCollection(clazz)) {
-            if (collection == null) {
-                if (Set.class.isAssignableFrom(clazz)) {
-                    collection = new HashSet();
-                } else {
-                    collection = new ArrayList();
-                }
-            }
-        }
-        return collection;
     }
 
     private static Collection getCollection(Field field, Object parentModel) {

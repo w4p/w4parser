@@ -12,15 +12,11 @@ import test.data.TestHtmlData;
 import test.model.*;
 import test.result.TestResult;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class ParserTest {
     private static final Logger LOG = LoggerFactory.getLogger(ParserTest.class);
