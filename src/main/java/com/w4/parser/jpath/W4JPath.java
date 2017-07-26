@@ -1,6 +1,6 @@
 package com.w4.parser.jpath;
 
-import com.w4.parser.annotations.W4Xpath;
+import com.w4.parser.annotations.W4Parse;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,10 +13,10 @@ public class W4JPath {
     private String path;
     private String attr;
 
-    private W4Xpath xpath;
+    private W4Parse xpath;
 
-    public W4JPath(W4Xpath w4Xpath, String xpath) {
-        this.xpath = w4Xpath;
+    public W4JPath(W4Parse w4Parse, String xpath) {
+        this.xpath = w4Parse;
         xpath = xpath.replace("//", " ").trim();
         String[] pathNodes = xpath.split("\\/");
         StringBuilder sb = new StringBuilder();
@@ -41,7 +41,7 @@ public class W4JPath {
     @Override
     public String toString() {
         return "W4JPath{" +
-                "path='" + path + '\'' +
+                "xpath='" + path + '\'' +
                 ", attr='" + attr + '\'' +
                 ", href='" + xpath + '\'' +
                 '}';

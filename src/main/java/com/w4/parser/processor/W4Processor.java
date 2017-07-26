@@ -2,8 +2,8 @@ package com.w4.parser.processor;
 
 import com.w4.parser.adapters.TypeAdapters;
 import com.w4.parser.annotations.W4Fetch;
+import com.w4.parser.annotations.W4Parse;
 import com.w4.parser.annotations.W4RegExp;
-import com.w4.parser.annotations.W4Xpath;
 import com.w4.parser.client.W4Response;
 import com.w4.parser.client.queue.W4Queue;
 import com.w4.parser.client.promise.W4ParsePromise;
@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -71,20 +72,21 @@ public class W4Processor {
 //    }
 
     public static <T> void parse(W4Response w4Response, W4ParsePromise<T> promise) throws W4ParserException {
+//        LOG.info("Generic class of list: {}", getClassE(new ArrayList<String>() {}));
         W4QueueTask task = w4Response.getQueueTask();
         Class<T> clazz = task.getClazz();
         try {
             Element document = null;
-            if (clazz.isAnnotationPresent(W4Xpath.class)) {
-                W4Xpath w4Xpath = clazz.getAnnotation(W4Xpath.class);
-                if (!w4Xpath.useXMLParser()) {
+            if (clazz.isAnnotationPresent(W4Parse.class)) {
+                W4Parse w4Parse = clazz.getAnnotation(W4Parse.class);
+                if (!w4Parse.useXMLParser()) {
                     document = Jsoup.parse(w4Response.getContent());
                 } else {
                     document = Jsoup.parse(w4Response.getContent(), "", Parser.xmlParser());
                 }
 
-                if (w4Xpath.path().length > 0 && !w4Xpath.path()[0].isEmpty()) {
-                    W4JPath w4JPath = new W4JPath(w4Xpath, w4Xpath.path()[0]);
+                if (w4Parse.xpath().length > 0 && !w4Parse.xpath()[0].isEmpty()) {
+                    W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.xpath()[0]);
                     document = document.select(w4JPath.getPath()).first();
                 }
             } else {
@@ -99,7 +101,7 @@ public class W4Processor {
             }
 
 
-            parse(document, clazz, task, (model) -> {
+            parse(document, clazz, task, (W4ParsePromise<T>) (model) -> {
                 promise.complete(model);
             });
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException e) {
@@ -108,24 +110,64 @@ public class W4Processor {
     }
 
     private static <T> void parse(Element element, Class<T> clazz,
+                                  W4QueueTask<?> task, W4ParsePromise<T> promise)
+            throws IllegalAccessException, InstantiationException, NoSuchMethodException {
+//        if (isCollection(clazz)) {
+//            T parentModel = clazz.newInstance();
+//            Collection collection = (Collection) parentModel;
+//            if (clazz.isAnnotationPresent(W4Parse.class)) {
+//                W4Parse w4Parse = clazz.getAnnotation(W4Parse.class);
+//                if (w4Parse.xpath().length > 0 && !w4Parse.xpath()[0].isEmpty()) {
+//                    for (String path : w4Parse.xpath()) {
+//                        W4JPath w4JPath = new W4JPath(w4Parse, path);
+//                        Elements elements = element.select(w4JPath.getPath());
+//                        if (elements.size() > 0) {
+//                            LOG.info("Generic class of list: {}", getClassE(collection));
+//                        }
+//                    }
+//                }
+//            }
+//        } else {
+//            T parentModel = clazz.newInstance();
+//            if (clazz.isAnnotationPresent(W4Parse.class)) {
+//                W4Parse w4Parse = clazz.getAnnotation(W4Parse.class);
+//                if (w4Parse.xpath().length > 0 && !w4Parse.xpath()[0].isEmpty()) {
+//                    W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.xpath()[0]);
+//                    element = element.select(w4JPath.getPath()).first();
+//                }
+//            }
+//            parse(element, parentModel, task, promise);
+//        }
+        //promise.complete(null);
+        T parentModel = clazz.newInstance();
+        if (clazz.isAnnotationPresent(W4Parse.class)) {
+            W4Parse w4Parse = clazz.getAnnotation(W4Parse.class);
+            if (w4Parse.xpath().length > 0 && !w4Parse.xpath()[0].isEmpty()) {
+                W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.xpath()[0]);
+                element = element.select(w4JPath.getPath()).first();
+            }
+        }
+        parse(element, parentModel, task, promise);
+    }
+
+    private static <T> void parse(Element element, T parentModel,
                                W4QueueTask<?> task, W4ParsePromise<T> promise)
             throws IllegalAccessException, InstantiationException, NoSuchMethodException {
         //Fields
         if (System.currentTimeMillis() < task.getStopedAt() || task.getStopedAt() == 0) {
             List<CompletableFuture<Void>> futureList = new ArrayList<>();
-            T parentModel = clazz.newInstance();
+            Class clazz = parentModel.getClass();
+
             Field[] fields = clazz.getDeclaredFields();
             for (Field field : fields) {
                 field.setAccessible(true);
                 Class<?> genericClass = getGenericClass(field);
-                if (field.isAnnotationPresent(W4Xpath.class)) {
+                if (field.isAnnotationPresent(W4Parse.class)) {
                     LOG.debug("Found annotation in {} on field: {}", clazz.getCanonicalName(), field.getName());
-
-                    W4Xpath w4Xpath = field.getAnnotation(W4Xpath.class);
-                    if (w4Xpath.path().length > 0) {
-
-                        for (int i = 0; i < w4Xpath.path().length; i++) {
-                            W4JPath w4JPath = new W4JPath(w4Xpath, w4Xpath.path()[i]);
+                    W4Parse w4Parse = field.getAnnotation(W4Parse.class);
+//                    if (w4Parse.xpath().length > 0) {
+                        for (int i = 0; i < w4Parse.xpath().length; i++) {
+                            W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.xpath()[i]);
                             LOG.debug("W4JPath: {}", w4JPath);
 
                             Elements elements;
@@ -144,7 +186,7 @@ public class W4Processor {
                                     final Collection collection = getCollection(field, parentModel);
                                     int cnt = 0;
                                     for (Iterator<Element> it = elements.iterator(); it.hasNext(); ) {
-                                        if (w4Xpath.maxCount() != 0 && w4Xpath.maxCount() <= cnt) {
+                                        if (w4Parse.maxCount() != 0 && w4Parse.maxCount() <= cnt) {
                                             break;
                                         }
                                         final CompletableFuture<Void> future = new CompletableFuture<>();
@@ -169,7 +211,7 @@ public class W4Processor {
                                 break;
                             }
                         }
-                    }
+//                    }
                 }
 
                 if (field.isAnnotationPresent(W4Fetch.class)) {
@@ -205,12 +247,12 @@ public class W4Processor {
                         //Parse links by href
                         if (w4Fetch.href().length > 0) {
                             int cnt = 0;
-                            for (W4Xpath w4XpathSub : w4Fetch.href()) {
-                                for (int i = 0; i < w4XpathSub.path().length; i++) {
+                            for (W4Parse w4ParseSub : w4Fetch.href()) {
+                                for (int i = 0; i < w4ParseSub.xpath().length; i++) {
                                     if (w4Fetch.maxFetch() != 0 && w4Fetch.maxFetch() <= cnt) {
                                         break;
                                     }
-                                    W4JPath w4JPath = new W4JPath(w4XpathSub, w4XpathSub.path()[i]);
+                                    W4JPath w4JPath = new W4JPath(w4ParseSub, w4ParseSub.xpath()[i]);
                                     Elements links = element.select(w4JPath.getPath());
                                     if (links.size() > 0) {
                                         for (Element link : links) {
@@ -221,7 +263,11 @@ public class W4Processor {
                                             getData(link, w4JPath, String.class, null, (url) -> {
                                                 url = normalizeURL(task.getW4Response(), url);
                                                 if (url != null) {
-                                                    W4QueueTask subtask = new W4QueueTask(genericClass, task.getQueue()).setUrl(url);
+                                                    W4QueueTask subtask = new W4QueueTask(genericClass, task.getQueue())
+                                                            .setUrl(url);
+                                                    if (field.isAnnotationPresent(W4Parse.class)) {
+                                                        subtask.setInheritXpath(field.getAnnotation(W4Parse.class));
+                                                    }
                                                     subtask.setStopedAt(task.getStopedAt());
                                                     final CompletableFuture<Void> future = new CompletableFuture<>();
                                                     futureList.add(future);
@@ -252,6 +298,20 @@ public class W4Processor {
         } else {
             promise.complete(null);
         }
+    }
+
+    private static Collection makeCollection(Class clazz) {
+        Collection collection = null;
+        if (isCollection(clazz)) {
+            if (collection == null) {
+                if (Set.class.isAssignableFrom(clazz)) {
+                    collection = new HashSet();
+                } else {
+                    collection = new ArrayList();
+                }
+            }
+        }
+        return collection;
     }
 
     private static Collection getCollection(Field field, Object parentModel) {
@@ -295,7 +355,11 @@ public class W4Processor {
     }
 
     private static boolean isCollection(Field field) {
-        return Collection.class.isAssignableFrom(field.getType());
+        return isCollection(field.getType());
+    }
+
+    private static boolean isCollection(Class classOf) {
+        return Collection.class.isAssignableFrom(classOf);
     }
 
     private static <T> void getData(Element element, W4JPath w4JPath, Class<T> clazz,
@@ -333,5 +397,23 @@ public class W4Processor {
     private static String normalizeURL(W4Response w4Response, String path) {
         URI uri = w4Response.getQueueTask().getW4Request().getRequest().getURI();
         return uri.resolve(path).toASCIIString();
+    }
+
+    private static <E> Class<E> getClassE(Collection<E> list) {
+        Class<?> listClass = list.getClass();
+
+        Type gSuper = listClass.getGenericSuperclass();
+        if(!(gSuper instanceof ParameterizedType))
+            throw new IllegalArgumentException();
+
+        ParameterizedType pType = (ParameterizedType)gSuper;
+
+        Type tArg = pType.getActualTypeArguments()[0];
+        if(!(tArg instanceof Class<?>))
+            throw new IllegalArgumentException();
+
+        @SuppressWarnings("unchecked")
+        final Class<E> classE = (Class<E>)tArg;
+        return classE;
     }
 }

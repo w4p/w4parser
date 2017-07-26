@@ -12,6 +12,7 @@ import test.data.TestHtmlData;
 import test.model.*;
 import test.result.TestResult;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -26,18 +27,27 @@ public class ParserTest {
 
     @Test
     public void parseClass() {
-        Habrahabr habrahabr = W4Parser.parse(Habrahabr.class).threads(5).get();
-        LOG.info("Result: {}", new Gson().toJson(habrahabr));
-
-        assertNotEquals(habrahabr, null);
+        try {
+            Habrahabr habrahabr = W4Parser.parse(Habrahabr.class).threads(5).get();
+            assertNotEquals(habrahabr, null);
+            assertEquals(habrahabr.getArticleList().size(), 2);
+            assertNotEquals(habrahabr.getWbbUser(), null);
+            assertEquals(habrahabr.getWbbUser().getUsername(), "wbb");
+            LOG.info("Result: {}", new Gson().toJson(habrahabr));
+        } catch (Throwable e) {
+            fail(e.getMessage());
+        }
     }
 
     @Test
-    public void parsePaginatio() {
+    public void parsePagination() {
         HabraTitleList habrahabr = W4Parser.parse(HabraTitleList.class).get();
         LOG.info("Result: {}", new Gson().toJson(habrahabr));
 
         assertNotEquals(habrahabr, null);
+        assertEquals(habrahabr.getTitleLists().size(), 3);
+        assertNotEquals(habrahabr.getTitleLists().get(0).getTitles(), null);
+        assertEquals(habrahabr.getTitleLists().get(0).getTitles().size(), 10);
     }
 
     @Test
@@ -46,6 +56,10 @@ public class ParserTest {
         LOG.info("Result: {}", new Gson().toJson(reuters));
 
         assertNotEquals(reuters, null);
+        assertNotEquals(reuters.getNewsList(), null);
+        assertNotEquals(reuters.getNewsList().get(0).getTitle(), null);
+        assertNotEquals(reuters.getNewsList().get(0).getDescription(), null);
+        assertNotEquals(reuters.getNewsList().get(0).getLink(), null);
     }
 
 
@@ -54,7 +68,7 @@ public class ParserTest {
     ////////////////////////////////////
 
 
-//    @Test
+    @Test
     public void testParser() {
         TestPageModel model = W4Processor.data(TestHtmlData.htmlReviewData(), TestPageModel.class).get();
 
@@ -87,7 +101,7 @@ public class ParserTest {
 
     }
 
-//    @Test
+    @Test
     public void testParserAsync() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
         W4Processor.data(TestHtmlData.htmlReviewData(), TestPageModel.class).get((TestPageModel model) -> {

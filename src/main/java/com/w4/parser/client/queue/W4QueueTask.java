@@ -1,13 +1,9 @@
 package com.w4.parser.client.queue;
 
-import com.w4.parser.annotations.W4Xpath;
-import com.w4.parser.client.W4QueueResult;
+import com.w4.parser.annotations.W4Parse;
 import com.w4.parser.client.W4Request;
 import com.w4.parser.client.W4Response;
 import com.w4.parser.client.promise.W4ParsePromise;
-import com.w4.parser.client.promise.W4QueueCompletePromise;
-import com.w4.parser.client.promise.W4QueueTaskPromise;
-import com.w4.parser.processor.W4Processor;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -28,6 +24,7 @@ public class W4QueueTask<T> {
     private W4ParsePromise<T> taskPromise;
 
     private Class<T> clazz;
+    private W4Parse inheritXpath;
 
     private long startedAt;
     private long stopedAt;
@@ -54,11 +51,8 @@ public class W4QueueTask<T> {
 
     private void run(W4ParsePromise<T> promise) {
         if (promise != null) {
-//            if (this.taskPromise == null) {
-//                this.taskPromise = promise;
-//            }
             this.startedAt = System.currentTimeMillis();
-            if (this.w4Request != null) {
+            if (this.w4Request != null && this.w4Request.getUrl() != null) {
                 this.w4Request.fetchAsync((response -> {
                     this.w4Response = response;
                     this.w4Response.parse(promise);

@@ -1,18 +1,18 @@
 package com.w4.parser;
 
 import com.w4.parser.annotations.W4Fetch;
-import com.w4.parser.annotations.W4Xpath;
-import com.w4.parser.client.promise.W4ParsePromise;
 import com.w4.parser.client.queue.W4Queue;
 import com.w4.parser.processor.W4Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
 public class W4Parser {
     private static final Logger LOG = LoggerFactory.getLogger(W4Parser.class);
+
+    public static <T extends Object> W4Queue parse(T obj) {
+        Class clazz = obj.getClass();
+        return parse(clazz);
+    }
 
     public static <T> W4Queue parse(Class<T> clazz) {
         if (clazz.isAnnotationPresent(W4Fetch.class)) {

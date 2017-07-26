@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface W4Fetch {
     String[] url() default "";
-    W4Xpath[] href() default {};
+    W4Parse[] href() default {};
 
     int maxDepth() default 3;
     int maxFetch() default 10;

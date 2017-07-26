@@ -8,11 +8,13 @@ import java.util.concurrent.TimeUnit;
 
 @Target(value={ElementType.METHOD, ElementType.FIELD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface W4Xpath {
-    String[] path() default "";
+public @interface W4Parse {
+    String[] xpath() default "";
     String defaultValue() default "";
     W4RegExp[] postProcess() default {};
     int maxCount() default  0;
+
+    Class modelClass() default Object.class;
 
     boolean html() default false;
     boolean useXMLParser() default true;
