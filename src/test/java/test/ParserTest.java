@@ -5,6 +5,7 @@ import com.w4.parser.W4Parser;
 import com.w4.parser.client.W4QueueResult;
 import com.w4.parser.processor.W4Processor;
 import org.eclipse.jetty.http.HttpHeader;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
+@Ignore
 public class ParserTest {
     private static final Logger LOG = LoggerFactory.getLogger(ParserTest.class);
 
@@ -163,7 +165,7 @@ public class ParserTest {
         LOG.info("Remote async parse test passed.");
     }
 
-//    @Test
+    @Test
     public void queue() {
         String url1 = "https://habrahabr.ru/users/";
         String url2 = "https://habrahabr.ru/hubs/";
@@ -183,7 +185,7 @@ public class ParserTest {
         LOG.info("Queue test passed");
     }
 
-//    @Test
+    @Test
     public void queueAsync() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
         String url3 = "https://habrahabr.ru/companies/";
