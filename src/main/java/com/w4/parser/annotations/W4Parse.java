@@ -13,8 +13,6 @@ public @interface W4Parse {
     W4RegExp[] postProcess() default {};
     int maxCount() default  0;
 
-    Class modelClass() default Object.class;
-
     boolean html() default false;
     boolean useXMLParser() default true;
 }

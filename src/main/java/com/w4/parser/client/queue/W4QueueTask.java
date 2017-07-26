@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Getter
@@ -21,10 +22,11 @@ public class W4QueueTask<T> {
     private W4Response w4Response;
 
 //    private W4QueueTask parent; //used for interbal @W4Fetch
-    private W4ParsePromise<T> taskPromise;
+    private W4ParsePromise<List<T>> taskPromise;
 
     private Class<T> clazz;
     private W4Parse inheritXpath;
+    private boolean list = false;
 
     private long startedAt;
     private long stopedAt;
@@ -49,7 +51,7 @@ public class W4QueueTask<T> {
         return this;
     }
 
-    private void run(W4ParsePromise<T> promise) {
+    private void run(W4ParsePromise<List<T>> promise) {
         if (promise != null) {
             this.startedAt = System.currentTimeMillis();
             if (this.w4Request != null && this.w4Request.getUrl() != null) {

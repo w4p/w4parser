@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -33,7 +35,7 @@ public class W4Response {
 //        W4Processor.parseAsync(this.content, this.queueTask, promise);
 //    }
 
-    public <T> void parse(W4ParsePromise<T> promise) {
+    public <T> void parse(W4ParsePromise<List<T>> promise) {
         W4Processor.parse(this, promise);
     }
 }

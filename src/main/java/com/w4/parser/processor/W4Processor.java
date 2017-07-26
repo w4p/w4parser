@@ -23,6 +23,7 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 
 public class W4Processor {
     private static final Logger LOG = LoggerFactory.getLogger(W4Processor.class);
@@ -71,7 +72,7 @@ public class W4Processor {
 //        return parse(html, task);
 //    }
 
-    public static <T> void parse(W4Response w4Response, W4ParsePromise<T> promise) throws W4ParserException {
+    public static <T> void parse(W4Response w4Response, W4ParsePromise<List<T>> promise) throws W4ParserException {
 //        LOG.info("Generic class of list: {}", getClassE(new ArrayList<String>() {}));
         W4QueueTask task = w4Response.getQueueTask();
         Class<T> clazz = task.getClazz();
@@ -101,26 +102,67 @@ public class W4Processor {
             }
 
 
-            parse(document, clazz, task, (W4ParsePromise<T>) (model) -> {
-                promise.complete(model);
+            parse(document, clazz, task, (List<T> result) -> {
+                promise.complete(result);
             });
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException e) {
             throw new W4ParserException(e);
         }
     }
 
-    private static <T> void parse(Element element, Class<T> clazz,
-                                  W4QueueTask<?> task, W4ParsePromise<T> promise)
-            throws IllegalAccessException, InstantiationException, NoSuchMethodException {
-        T parentModel = clazz.newInstance();
+    private static <T> Elements getClassElements(Element element, Class<T> clazz, W4QueueTask<?> task) {
+        Elements elements = new Elements(element);
+
         if (clazz.isAnnotationPresent(W4Parse.class)) {
             W4Parse w4Parse = clazz.getAnnotation(W4Parse.class);
             if (w4Parse.xpath().length > 0 && !w4Parse.xpath()[0].isEmpty()) {
                 W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.xpath()[0]);
-                element = element.select(w4JPath.getPath()).first();
+                elements = element.select(w4JPath.getPath());
+            }
+        } else if (task.getInheritXpath() != null) {
+            W4Parse w4Parse = task.getInheritXpath();
+            if (w4Parse.xpath().length > 0 && !w4Parse.xpath()[0].isEmpty()) {
+                W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.xpath()[0]);
+                elements = element.select(w4JPath.getPath());
             }
         }
-        parse(element, parentModel, task, promise);
+        return elements;
+    }
+
+    private static <T> void parse(Element element, Class<T> clazz,
+                                  W4QueueTask<?> task, W4ParsePromise<List<T>> promise)
+            throws IllegalAccessException, InstantiationException, NoSuchMethodException {
+        List<T> resultList = new ArrayList<>();
+        List<CompletableFuture<Void>> futureList = new ArrayList<>();
+//        Elements elements = new Elements(element);
+
+        if (TypeAdapters.isContainType(clazz)) {
+            if (task.getInheritXpath() != null) {
+                W4Parse w4Parse = task.getInheritXpath();
+                if (w4Parse.xpath().length > 0 && !w4Parse.xpath()[0].isEmpty()) {
+                    W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.xpath()[0]);
+                    Elements elements = element.select(w4JPath.getPath());
+                    for (Element el : elements) {
+                        resultList.add(getValue(el, w4JPath, clazz));
+                    }
+                }
+            }
+        } else {
+            Elements elements = getClassElements(element, clazz, task);
+            for (Element el : elements) {
+                CompletableFuture<Void> future = new CompletableFuture<>();
+                futureList.add(future);
+                T parentModel = clazz.newInstance();
+                parse(el, parentModel, task, (model) -> {
+                    resultList.add(model);
+                    future.complete(null);
+                });
+            }
+        }
+
+        CompletableFuture.allOf(futureList.toArray(new CompletableFuture[futureList.size()])).thenRun(() -> {
+            promise.complete(resultList);
+        });
     }
 
     private static <T> void parse(Element element, T parentModel,
@@ -203,11 +245,11 @@ public class W4Processor {
                                 subtask.setStopedAt(task.getStopedAt());
                                 final CompletableFuture<Void> future = new CompletableFuture<>();
                                 futureList.add(future);
-                                subtask.setTaskPromise((model) -> {
+                                subtask.setTaskPromise((list) -> {
                                     if (!isCollection(field)) {
-                                        setFieldValue(field, parentModel, model);
+                                        setFieldValue(field, parentModel, ((List) list).get(0));
                                     } else {
-                                        collection.add(model);
+                                        collection.addAll((Collection) list);
                                     }
                                     future.complete(null);
                                 });
@@ -244,11 +286,11 @@ public class W4Processor {
                                                     subtask.setStopedAt(task.getStopedAt());
                                                     final CompletableFuture<Void> future = new CompletableFuture<>();
                                                     futureList.add(future);
-                                                    subtask.setTaskPromise((model) -> {
+                                                    subtask.setTaskPromise((list) -> {
                                                         if (!isCollection(field)) {
-                                                            setFieldValue(field, parentModel, model);
+                                                            setFieldValue(field, parentModel, ((List) list).get(0));
                                                         } else {
-                                                            collection.add(model);
+                                                            collection.addAll((Collection) list);
                                                         }
                                                         future.complete(null);
                                                     });
@@ -325,9 +367,40 @@ public class W4Processor {
                                  W4QueueTask<?> task, W4ParsePromise<T> promise)
             throws IllegalAccessException, NoSuchMethodException {
         if (TypeAdapters.isContainType(clazz)) {
+//            String data = (w4JPath.getAttr() != null && !w4JPath.getAttr().isEmpty())
+//                    ? element.attr(w4JPath.getAttr()).trim()
+//                        : ((w4JPath.getXpath().html()) ? element.html() : element.text()).trim();
+//            if (w4JPath.getXpath().postProcess().length > 0) {
+//                for (W4RegExp w4RegExp : w4JPath.getXpath().postProcess()) {
+//                    data = data.replaceAll(w4RegExp.search(), w4RegExp.replace());
+//                }
+//            }
+//            if (data == null || data.isEmpty()) {
+//                data = w4JPath.getXpath().defaultValue();
+//            }
+//            try {
+////                return TypeAdapters.getValue(data.trim(), clazz);
+//                promise.complete(TypeAdapters.getValue(data.trim(), clazz));
+//            } catch (NumberFormatException e) {
+//                LOG.warn("Cast exception on field {}. Details: {}", w4JPath.getPath(), e.getMessage());
+//                promise.complete(null);
+//            }
+            promise.complete(getValue(element, w4JPath, clazz));
+        } else {
+            try {
+                T t = clazz.newInstance();
+                parse(element, t, task, promise);
+            } catch (InstantiationException e) {
+                throw new W4ParserException("Class " + clazz.getName() + " doesn't contain default contructor");
+            }
+        }
+    }
+
+    private static <T> T getValue(Element element, W4JPath w4JPath, Class<T> clazz) {
+        if (TypeAdapters.isContainType(clazz)) {
             String data = (w4JPath.getAttr() != null && !w4JPath.getAttr().isEmpty())
                     ? element.attr(w4JPath.getAttr()).trim()
-                        : ((w4JPath.getXpath().html()) ? element.html() : element.text()).trim();
+                    : ((w4JPath.getXpath().html()) ? element.html() : element.text()).trim();
             if (w4JPath.getXpath().postProcess().length > 0) {
                 for (W4RegExp w4RegExp : w4JPath.getXpath().postProcess()) {
                     data = data.replaceAll(w4RegExp.search(), w4RegExp.replace());
@@ -337,19 +410,13 @@ public class W4Processor {
                 data = w4JPath.getXpath().defaultValue();
             }
             try {
-//                return TypeAdapters.getValue(data.trim(), clazz);
-                promise.complete(TypeAdapters.getValue(data.trim(), clazz));
+                return TypeAdapters.getValue(data.trim(), clazz);
             } catch (NumberFormatException e) {
                 LOG.warn("Cast exception on field {}. Details: {}", w4JPath.getPath(), e.getMessage());
-                promise.complete(null);
-            }
-        } else {
-            try {
-                parse(element, clazz, task, promise);
-            } catch (InstantiationException e) {
-                throw new W4ParserException("Class " + clazz.getName() + " doesn't contain default contructor");
+                return null;
             }
         }
+        return null;
     }
 
 
