@@ -12,7 +12,7 @@ public @interface W4Fetch {
     String[] url() default "";
     W4Parse[] href() default {};
 
-    int maxDepth() default 3;
+    int depth() default 3;
     int maxFetch() default 10;
 
     int timeout() default 0;

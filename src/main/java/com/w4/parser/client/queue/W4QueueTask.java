@@ -31,6 +31,8 @@ public class W4QueueTask<T> {
     private long startedAt;
     private long stopedAt;
 
+    private W4QueueTask parentTask;
+
     private int depth = 0;
 
     public W4QueueTask(Class<T> clazz, W4Queue queue) {

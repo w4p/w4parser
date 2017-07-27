@@ -70,9 +70,11 @@ public class TypeAdapters {
     }
 
     public static <T> T getValue(String data, Class<T> clazz) {
-        TypeAdapter<T> adapter = (TypeAdapter<T>) typeTokenCache.get(clazz);
-        if (adapter != null) {
-            return adapter.toObject(data);
+        if (data != null) {
+            TypeAdapter<T> adapter = (TypeAdapter<T>) typeTokenCache.get(clazz);
+            if (adapter != null) {
+                return adapter.toObject(data);
+            }
         }
         return null;
     }

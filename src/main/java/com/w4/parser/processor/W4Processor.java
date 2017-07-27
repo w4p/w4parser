@@ -183,46 +183,55 @@ public class W4Processor {
                         for (int i = 0; i < w4Parse.select().length; i++) {
                             W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.select()[i]);
                             LOG.debug("W4JPath: {}", w4JPath);
+                            if (!w4JPath.getPath().startsWith("$")) {
+                                Elements elements;
+                                if (!w4JPath.getPath().isEmpty()) {
+                                    elements = element.select(w4JPath.getPath());
+                                } else {
+                                    elements = new Elements(element);
+                                }
+                                LOG.debug("Elements by {} found: {}", w4JPath.getPath(), elements.size());
 
-                            Elements elements;
-                            if (!w4JPath.getPath().isEmpty()) {
-                                elements = element.select(w4JPath.getPath());
-                            } else {
-                                elements = new Elements(element);
-                            }
-                            LOG.debug("Elements by {} found: {}", w4JPath.getPath(), elements.size());
+                                if (elements.size() > 0) {
+                                    //FOUND DATA
 
-                            if (elements.size() > 0) {
-                                //FOUND DATA
-
-                                if (isCollection(field)) {
-                                    //IT is collection
-                                    final Collection collection = getCollection(field, parentModel);
-                                    int cnt = 0;
-                                    for (Iterator<Element> it = elements.iterator(); it.hasNext(); ) {
-                                        if (w4Parse.maxCount() != 0 && w4Parse.maxCount() <= cnt) {
-                                            break;
+                                    if (isCollection(field)) {
+                                        //IT is collection
+                                        final Collection collection = getCollection(field, parentModel);
+                                        int cnt = 0;
+                                        for (Iterator<Element> it = elements.iterator(); it.hasNext(); ) {
+                                            if (w4Parse.maxCount() != 0 && w4Parse.maxCount() <= cnt) {
+                                                break;
+                                            }
+                                            final CompletableFuture<Void> future = new CompletableFuture<>();
+                                            futureList.add(future);
+                                            getData(it.next(), w4JPath, genericClass, task, (model) -> {
+                                                if (model != null) {
+                                                    collection.add(model);
+                                                }
+                                                future.complete(null);
+                                            });
+                                            cnt++;
                                         }
+                                    } else {
+                                        //bindData
                                         final CompletableFuture<Void> future = new CompletableFuture<>();
                                         futureList.add(future);
-                                        getData(it.next(), w4JPath, genericClass, task, (model) -> {
-                                            if (model != null) {
-                                                collection.add(model);
-                                            }
+                                        getData(elements.first(), w4JPath, genericClass, task, (model) -> {
+                                            setFieldValue(field, parentModel, model);
                                             future.complete(null);
                                         });
-                                        cnt++;
                                     }
-                                } else {
-                                    //bindData
-                                    final CompletableFuture<Void> future = new CompletableFuture<>();
-                                    futureList.add(future);
-                                    getData(elements.first(), w4JPath, genericClass, task, (model) -> {
-                                        setFieldValue(field, parentModel, model);
-                                        future.complete(null);
-                                    });
+                                    break;
                                 }
-                                break;
+                            } else {
+                                Object val = TypeAdapters.getValue(getInternalData(task, w4JPath), genericClass);
+                                if (isCollection(field)) {
+                                    final Collection collection = getCollection(field, parentModel);
+                                    collection.add(val);
+                                } else {
+                                    setFieldValue(field, parentModel, val);
+                                }
                             }
                         }
 //                    }
@@ -230,8 +239,9 @@ public class W4Processor {
 
                 if (field.isAnnotationPresent(W4Fetch.class)) {
 //                //Fetch remote data
+
                     W4Fetch w4Fetch = field.getAnnotation(W4Fetch.class);
-                    if (task.getDepth() < w4Fetch.maxDepth()) {
+                    if (task.getDepth() < w4Fetch.depth()) {
                         final Collection collection = getCollection(field, parentModel);
                         if (w4Fetch.url().length > 0 && !w4Fetch.url()[0].isEmpty()) {
 //                    //Hardcoded URL
@@ -240,20 +250,7 @@ public class W4Processor {
                                 if (w4Fetch.maxFetch() != 0 && w4Fetch.maxFetch() <= cnt) {
                                     break;
                                 }
-                                W4QueueTask subtask = new W4QueueTask(genericClass, task.getQueue()).setUrl(url);
-                                subtask.setStopedAt(task.getStopedAt());
-                                final CompletableFuture<Void> future = new CompletableFuture<>();
-                                futureList.add(future);
-                                subtask.setTaskPromise((list) -> {
-                                    if (!isCollection(field)) {
-                                        setFieldValue(field, parentModel, ((List) list).get(0));
-                                    } else {
-                                        collection.addAll((Collection) list);
-                                    }
-                                    future.complete(null);
-                                });
-                                subtask.setDepth(task.getDepth() + 1);
-                                task.getQueue().addInternalQueue(subtask);
+                                futureList.add(processSubTask(url, genericClass, task, field, parentModel));
                                 cnt++;
                             }
                         }
@@ -273,30 +270,13 @@ public class W4Processor {
                                             if (w4Fetch.maxFetch() != 0 && w4Fetch.maxFetch() <= cnt) {
                                                 break;
                                             }
-                                            cnt++;
                                             getData(link, w4JPath, String.class, null, (url) -> {
                                                 url = normalizeURL(task.getW4Response(), url);
                                                 if (url != null) {
-                                                    W4QueueTask subtask = new W4QueueTask(genericClass, task.getQueue())
-                                                            .setUrl(url);
-                                                    if (field.isAnnotationPresent(W4Parse.class)) {
-                                                        subtask.setInheritXpath(field.getAnnotation(W4Parse.class));
-                                                    }
-                                                    subtask.setStopedAt(task.getStopedAt());
-                                                    final CompletableFuture<Void> future = new CompletableFuture<>();
-                                                    futureList.add(future);
-                                                    subtask.setTaskPromise((list) -> {
-                                                        if (!isCollection(field)) {
-                                                            setFieldValue(field, parentModel, ((List) list).get(0));
-                                                        } else {
-                                                            collection.addAll((Collection) list);
-                                                        }
-                                                        future.complete(null);
-                                                    });
-                                                    subtask.setDepth(task.getDepth() + 1);
-                                                    task.getQueue().addInternalQueue(subtask);
+                                                    futureList.add(processSubTask(url, genericClass, task, field, parentModel));
                                                 }
                                             });
+                                            cnt++;
                                         }
                                     }
                                 }
@@ -312,6 +292,31 @@ public class W4Processor {
         } else {
             promise.complete(null);
         }
+    }
+
+    private static <E> CompletableFuture<Void> processSubTask(String url, Class<E> genericClass,
+                                                                 W4QueueTask<?> parentTask, Field field, Object parentModel) {
+        final CompletableFuture<Void> future = new CompletableFuture<>();
+        W4QueueTask<E> subtask = new W4QueueTask(genericClass, parentTask.getQueue())
+                .setUrl(url);
+        subtask.setParentTask(parentTask);
+        if (field.isAnnotationPresent(W4Parse.class)) {
+            subtask.setInheritXpath(field.getAnnotation(W4Parse.class));
+        }
+        subtask.setStopedAt(parentTask.getStopedAt());
+        subtask.setTaskPromise((list) -> {
+            if (!isCollection(field)) {
+                setFieldValue(field, parentModel, ((List) list).get(0));
+            } else {
+                final Collection collection = getCollection(field, parentModel);
+                collection.addAll((Collection) list);
+            }
+            future.complete(null);
+        });
+        subtask.setDepth(parentTask.getDepth() + 1);
+        parentTask.getQueue().addInternalQueue(subtask);
+
+        return future;
     }
 
     private static Collection getCollection(Field field, Object parentModel) {
@@ -366,25 +371,12 @@ public class W4Processor {
                                  W4QueueTask<?> task, W4ParsePromise<T> promise)
             throws IllegalAccessException, NoSuchMethodException {
         if (TypeAdapters.isContainType(clazz)) {
-//            String data = (w4JPath.getAttr() != null && !w4JPath.getAttr().isEmpty())
-//                    ? element.attr(w4JPath.getAttr()).trim()
-//                        : ((w4JPath.getXpath().html()) ? element.html() : element.text()).trim();
-//            if (w4JPath.getXpath().postProcess().length > 0) {
-//                for (W4RegExp w4RegExp : w4JPath.getXpath().postProcess()) {
-//                    data = data.replaceAll(w4RegExp.search(), w4RegExp.replace());
-//                }
-//            }
-//            if (data == null || data.isEmpty()) {
-//                data = w4JPath.getXpath().defaultValue();
-//            }
-//            try {
-////                return TypeAdapters.getValue(data.trim(), clazz);
-//                promise.complete(TypeAdapters.getValue(data.trim(), clazz));
-//            } catch (NumberFormatException e) {
-//                LOG.warn("Cast exception on field {}. Details: {}", w4JPath.getPath(), e.getMessage());
-//                promise.complete(null);
-//            }
-            promise.complete(getValue(element, w4JPath, clazz));
+            if (w4JPath.getPath().startsWith("$")) {
+                //Internal selector
+                promise.complete(TypeAdapters.getValue(getInternalData(task, w4JPath), clazz));
+            } else {
+                promise.complete(getValue(element, w4JPath, clazz));
+            }
         } else {
             try {
                 T t = clazz.newInstance();
@@ -416,6 +408,24 @@ public class W4Processor {
             }
         }
         return null;
+    }
+
+    private static String getInternalData(W4QueueTask task, W4JPath jPath) {
+        switch (jPath.getPath()) {
+            case W4Select.CONTENT_LENGTH : {
+                return String.valueOf(task.getW4Response().getContent().length());
+            }
+            case W4Select.CURRENT_URL : {
+                return task.getW4Request().getUrl();
+            }
+            case W4Select.RESPONSE_CODE : {
+                return String.valueOf(task.getW4Response().getResponseCode());
+            }
+            case W4Select.USER_AGENT : {
+                return String.valueOf(task.getW4Request().getRequest().getAgent());
+            }
+            default: return null;
+        }
     }
 
 

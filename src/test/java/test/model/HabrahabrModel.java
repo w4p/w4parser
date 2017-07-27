@@ -12,7 +12,7 @@ public class HabrahabrModel {
     @W4Parse(select = "a[class*=\"nav-links__item-link_current\"]")
     private String title;
 
-    @W4Fetch(href = @W4Parse(select = "//a[class*=\"nav-links__item-link\"]/@href"), maxDepth = 2, maxFetch = 2)
+    @W4Fetch(href = @W4Parse(select = "//a[class*=\"nav-links__item-link\"]/@href"), depth = 2, maxFetch = 2)
     private List<HabrahabrModel> habrahabrModelList;
 
     @Override

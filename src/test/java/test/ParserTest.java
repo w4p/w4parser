@@ -31,6 +31,7 @@ public class ParserTest {
             assertEquals(habrahabr.getArticleList().size(), 2);
             assertNotEquals(habrahabr.getWbbUser(), null);
             assertEquals(habrahabr.getWbbUser().getUsername(), "wbb");
+            assertEquals(habrahabr.getUrl(), "https://habrahabr.ru/top/");
             LOG.info("Result: {}", new Gson().toJson(habrahabr));
         } catch (Throwable e) {
             fail(e.getMessage());

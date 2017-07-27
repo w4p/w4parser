@@ -2,6 +2,7 @@ package test.model;
 
 import com.w4.parser.annotations.W4Fetch;
 import com.w4.parser.annotations.W4Parse;
+import com.w4.parser.processor.W4Select;
 import lombok.Getter;
 
 import java.util.List;
@@ -15,6 +16,18 @@ public class Habrahabr {
 
     @W4Fetch(url = "https://habrahabr.ru/users/wbb/")
     private HabrahabrUser wbbUser;
+
+    @W4Parse(select = W4Select.CURRENT_URL)
+    private String url;
+
+    @W4Parse(select = W4Select.RESPONSE_CODE)
+    private int code;
+
+    @W4Parse(select = W4Select.CONTENT_LENGTH)
+    private int length;
+
+    @W4Parse(select = W4Select.USER_AGENT)
+    private String ua;
 
     @W4Fetch(href = @W4Parse(select = "//a[class=\"post__title_link\"]/@href"), maxFetch = 2)
     private List<HabrahabrArticle> articleList;
