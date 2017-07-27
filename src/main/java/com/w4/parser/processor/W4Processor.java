@@ -23,7 +23,6 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 
 public class W4Processor {
     private static final Logger LOG = LoggerFactory.getLogger(W4Processor.class);
@@ -86,8 +85,8 @@ public class W4Processor {
                     document = Jsoup.parse(w4Response.getContent(), "", Parser.xmlParser());
                 }
 
-                if (w4Parse.xpath().length > 0 && !w4Parse.xpath()[0].isEmpty()) {
-                    W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.xpath()[0]);
+                if (w4Parse.select().length > 0 && !w4Parse.select()[0].isEmpty()) {
+                    W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.select()[0]);
                     document = document.select(w4JPath.getPath()).first();
                 }
             } else {
@@ -115,14 +114,14 @@ public class W4Processor {
 
         if (clazz.isAnnotationPresent(W4Parse.class)) {
             W4Parse w4Parse = clazz.getAnnotation(W4Parse.class);
-            if (w4Parse.xpath().length > 0 && !w4Parse.xpath()[0].isEmpty()) {
-                W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.xpath()[0]);
+            if (w4Parse.select().length > 0 && !w4Parse.select()[0].isEmpty()) {
+                W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.select()[0]);
                 elements = element.select(w4JPath.getPath());
             }
         } else if (task.getInheritXpath() != null) {
             W4Parse w4Parse = task.getInheritXpath();
-            if (w4Parse.xpath().length > 0 && !w4Parse.xpath()[0].isEmpty()) {
-                W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.xpath()[0]);
+            if (w4Parse.select().length > 0 && !w4Parse.select()[0].isEmpty()) {
+                W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.select()[0]);
                 elements = element.select(w4JPath.getPath());
             }
         }
@@ -139,8 +138,8 @@ public class W4Processor {
         if (TypeAdapters.isContainType(clazz)) {
             if (task.getInheritXpath() != null) {
                 W4Parse w4Parse = task.getInheritXpath();
-                if (w4Parse.xpath().length > 0 && !w4Parse.xpath()[0].isEmpty()) {
-                    W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.xpath()[0]);
+                if (w4Parse.select().length > 0 && !w4Parse.select()[0].isEmpty()) {
+                    W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.select()[0]);
                     Elements elements = element.select(w4JPath.getPath());
                     for (Element el : elements) {
                         resultList.add(getValue(el, w4JPath, clazz));
@@ -180,9 +179,9 @@ public class W4Processor {
                 if (field.isAnnotationPresent(W4Parse.class)) {
                     LOG.debug("Found annotation in {} on field: {}", clazz.getCanonicalName(), field.getName());
                     W4Parse w4Parse = field.getAnnotation(W4Parse.class);
-//                    if (w4Parse.xpath().length > 0) {
-                        for (int i = 0; i < w4Parse.xpath().length; i++) {
-                            W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.xpath()[i]);
+//                    if (w4Parse.select().length > 0) {
+                        for (int i = 0; i < w4Parse.select().length; i++) {
+                            W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.select()[i]);
                             LOG.debug("W4JPath: {}", w4JPath);
 
                             Elements elements;
@@ -263,11 +262,11 @@ public class W4Processor {
                         if (w4Fetch.href().length > 0) {
                             int cnt = 0;
                             for (W4Parse w4ParseSub : w4Fetch.href()) {
-                                for (int i = 0; i < w4ParseSub.xpath().length; i++) {
+                                for (int i = 0; i < w4ParseSub.select().length; i++) {
                                     if (w4Fetch.maxFetch() != 0 && w4Fetch.maxFetch() <= cnt) {
                                         break;
                                     }
-                                    W4JPath w4JPath = new W4JPath(w4ParseSub, w4ParseSub.xpath()[i]);
+                                    W4JPath w4JPath = new W4JPath(w4ParseSub, w4ParseSub.select()[i]);
                                     Elements links = element.select(w4JPath.getPath());
                                     if (links.size() > 0) {
                                         for (Element link : links) {

@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 @Target(value={ElementType.METHOD, ElementType.FIELD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface W4Parse {
-    String[] xpath() default "";
+    String[] select() default "";
     String defaultValue() default "";
     W4RegExp[] postProcess() default {};
     int maxCount() default  0;

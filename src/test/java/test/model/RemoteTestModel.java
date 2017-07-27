@@ -12,10 +12,10 @@ import java.util.concurrent.TimeUnit;
 @W4Fetch(timeout = 8000, timeUnit = TimeUnit.MILLISECONDS)
 public class RemoteTestModel {
 
-    @W4Parse(xpath = "/h1[class=\"bcrs\"]//b")
+    @W4Parse(select = "/h1[class=\"bcrs\"]//b")
     private String category;
 
-    @W4Parse(xpath = "//*[class*=\"sresult\"]")
+    @W4Parse(select = "//*[class*=\"sresult\"]")
     private List<Item> items;
 
     @W4Fetch(url = "https://habrahabr.ru/users/")
@@ -32,11 +32,11 @@ public class RemoteTestModel {
 
     public static class Item {
 
-        @W4Parse(xpath = "//h3[class=\"lvtitle\"]/a")
+        @W4Parse(select = "//h3[class=\"lvtitle\"]/a")
         private String name;
 
         @W4Parse(
-                xpath = {"//span[class=\"prRange\"]", "li[class*=\"lvprice\"]/span"},
+                select = {"//span[class=\"prRange\"]", "li[class*=\"lvprice\"]/span"},
                 postProcess = @W4RegExp(search = "^\\$([0-9]*\\.?[0-9]+).*$", replace = "$1"))
         private Float minPrice;
 

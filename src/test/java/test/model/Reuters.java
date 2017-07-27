@@ -11,20 +11,20 @@ import java.util.List;
 public class Reuters {
 
 
-    @W4Parse(xpath = "//item")
+    @W4Parse(select = "//item")
     private List<ReuterNews> newsList;
 
 
     @Getter
     public static class ReuterNews {
 
-        @W4Parse(xpath = "title")
+        @W4Parse(select = "title")
         private String title;
 
-        @W4Parse(xpath = "description")
+        @W4Parse(select = "description")
         private String description;
 
-        @W4Parse(xpath = "link")
+        @W4Parse(select = "link")
         private String link;
 
 

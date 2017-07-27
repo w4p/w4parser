@@ -41,7 +41,7 @@ public class W4JPath {
     @Override
     public String toString() {
         return "W4JPath{" +
-                "xpath='" + path + '\'' +
+                "select='" + path + '\'' +
                 ", attr='" + attr + '\'' +
                 ", href='" + xpath + '\'' +
                 '}';

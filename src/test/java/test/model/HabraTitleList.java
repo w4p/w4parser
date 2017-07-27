@@ -11,15 +11,15 @@ import java.util.List;
 public class HabraTitleList {
 
 
-    @W4Parse(xpath = "//a[class*=\"post__title_link\"]")
-    @W4Fetch(href = @W4Parse(xpath = "//a[class*=\"toggle-menu__item-link_pagination\"]/@href"),
+    @W4Parse(select = "//a[class*=\"post__title_link\"]")
+    @W4Fetch(href = @W4Parse(select = "//a[class*=\"toggle-menu__item-link_pagination\"]/@href"),
              maxDepth = 2, maxFetch = 2)
     private List<String> titleLists;
 
 //    @Getter
 //    public static class TitleList {
 //
-//        @W4Parse(xpath = "//a[class*=\"post__title_link\"]")
+//        @W4Parse(select = "//a[class*=\"post__title_link\"]")
 //        private List<String> titles;
 //    }
 }
