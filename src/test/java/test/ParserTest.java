@@ -26,12 +26,13 @@ public class ParserTest {
     @Test
     public void parseClass() {
         try {
-            Habrahabr habrahabr = W4Parser.parse(Habrahabr.class).threads(5).get();
+            Habrahabr habrahabr = W4Parser.agent("W4P user agent").parse(Habrahabr.class).threads(5).get();
             assertNotEquals(habrahabr, null);
             assertEquals(habrahabr.getArticleList().size(), 2);
             assertNotEquals(habrahabr.getWbbUser(), null);
             assertEquals(habrahabr.getWbbUser().getUsername(), "wbb");
             assertEquals(habrahabr.getUrl(), "https://habrahabr.ru/top/");
+            assertEquals(habrahabr.getUa(), "W4P user agent");
             LOG.info("Result: {}", new Gson().toJson(habrahabr));
         } catch (Throwable e) {
             fail(e.getMessage());

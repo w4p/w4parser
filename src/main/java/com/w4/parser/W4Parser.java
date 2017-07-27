@@ -37,4 +37,8 @@ public class W4Parser {
     public static W4Queue queue() {
         return new W4Queue();
     }
+
+    public static W4Queue agent(String userAgent) {
+        return new W4Queue().agent(userAgent);
+    }
 }

@@ -1,5 +1,8 @@
 package com.w4.parser.client.queue;
 
+import com.w4.parser.W4Parser;
+import com.w4.parser.annotations.W4Fetch;
+import com.w4.parser.annotations.W4Parse;
 import com.w4.parser.client.W4QueueResult;
 import com.w4.parser.client.W4Request;
 import com.w4.parser.client.promise.W4ParsePromise;
@@ -51,6 +54,17 @@ public class W4Queue {
         W4QueueTask task = new W4QueueTask(clazz, this).setUrl(url);
         addQueue(task);
         this.lastTask = task;
+        return this;
+    }
+
+    public W4Queue parse(Class clazz) {
+        if (clazz.isAnnotationPresent(W4Fetch.class)) {
+            W4Fetch w4Fetch = (W4Fetch) clazz.getAnnotation(W4Fetch.class);
+            if (w4Fetch.url().length > 0 &&  !w4Fetch.url()[0].isEmpty()) {
+                String url = w4Fetch.url()[0];
+                return this.url(url, clazz);
+            }
+        }
         return this;
     }
 
@@ -161,6 +175,6 @@ public class W4Queue {
     }
 
     public String getUserAgent() {
-        return this.userAgent;
+        return userAgent;
     }
 }
