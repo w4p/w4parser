@@ -30,6 +30,8 @@ public class W4Queue {
 
     private int maxThreads = 10;
     private int activeThreads = 0;
+    private String userAgent;
+
     CountDownLatch latch;
 
 
@@ -54,6 +56,11 @@ public class W4Queue {
 
     public W4Queue threads(int max) {
         this.maxThreads = max;
+        return this;
+    }
+
+    public W4Queue agent(String ua) {
+        this.userAgent = ua;
         return this;
     }
 
@@ -151,5 +158,9 @@ public class W4Queue {
 
     public synchronized void threadMonitor(int add) {
         this.activeThreads += add;
+    }
+
+    public String getUserAgent() {
+        return this.userAgent;
     }
 }

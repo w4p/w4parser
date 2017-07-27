@@ -26,6 +26,7 @@ public class W4Request {
 
     private Request request;
     private String url;
+    private String agent;
 
     private long startedAt;
 
@@ -86,13 +87,16 @@ public class W4Request {
     }
 
     public W4Request agent(String ua) {
-        this.request.agent(ua);
+        this.agent = ua;
         return this;
     }
 
     public W4Response fetch() {
         this.queueTask.getQueue().threadMonitor(1);
         this.startedAt = System.currentTimeMillis();
+        if (this.agent != null) {
+            this.request.agent(this.agent);
+        }
         updateTimeout();
         W4Response response = new W4Response(this.queueTask);
         try {
@@ -110,6 +114,9 @@ public class W4Request {
 
     public void fetchAsync(W4ResponsePromise responsePromise) {
         this.startedAt = System.currentTimeMillis();
+        if (this.agent != null) {
+            this.request.agent(this.agent);
+        }
         this.queueTask.getQueue().threadMonitor(1);
         LOG.info("Fetch data from: {}", this.request.getURI());
         updateTimeout();

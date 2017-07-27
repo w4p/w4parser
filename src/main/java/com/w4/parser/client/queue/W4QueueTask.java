@@ -50,6 +50,9 @@ public class W4QueueTask<T> {
     public W4QueueTask setUrl(String url) {
         this.queue = queue;
         this.w4Request = new W4Request(this, url);
+        if (this.queue.getUserAgent() != null) {
+            this.w4Request.agent(this.queue.getUserAgent());
+        }
         return this;
     }
 
