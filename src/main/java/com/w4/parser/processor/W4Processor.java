@@ -85,10 +85,10 @@ public class W4Processor {
                     document = Jsoup.parse(w4Response.getContent(), "", Parser.xmlParser());
                 }
 
-                if (w4Parse.select().length > 0 && !w4Parse.select()[0].isEmpty()) {
-                    W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.select()[0]);
-                    document = document.select(w4JPath.getPath()).first();
-                }
+//                if (w4Parse.select().length > 0 && !w4Parse.select()[0].isEmpty()) {
+//                    W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.select()[0]);
+//                    document = document.select(w4JPath.getPath()).first();
+//                }
             } else {
                 document = Jsoup.parse(w4Response.getContent(), "", Parser.xmlParser());
             }

@@ -40,6 +40,22 @@ public class ParserTest {
     }
 
     @Test
+    public void parseAdvancedSelect() {
+        try {
+            Mua mua = W4Parser.agent("W4P user agent").parse(Mua.class).threads(5).get();
+            assertNotEquals(mua, null);
+            assertNotEquals(mua.getGadgetList(), null);
+            assertEquals(mua.getGadgetList().size(), 3);
+            assertNotEquals(mua.getGadgetList().get(0).getGadgetName(), null);
+            assertNotEquals(mua.getGadgetList().get(0).getReviewSearch(), null);
+            assertNotEquals(mua.getGadgetList().get(0).getReviewSearch().getGadgetReviewList(), null);
+            LOG.info("Result: {}", new Gson().toJson(mua));
+        } catch (Throwable e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
     public void parsePagination() {
         HabraTitleList habrahabr = W4Parser.parse(HabraTitleList.class).get();
         LOG.info("Result: {}", new Gson().toJson(habrahabr));

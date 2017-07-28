@@ -106,10 +106,12 @@ public class W4Queue {
     }
 
     public W4QueueResult run() {
+        long startedAt = System.currentTimeMillis();
         latch = new CountDownLatch(this.requestList.size());
         runTaskList(latch);
         try {
             latch.await(this.timeout, this.timeUnit);
+            this.result.setCompleteTime(System.currentTimeMillis() - startedAt);
         } catch (InterruptedException e) {
         }
         return this.result;
