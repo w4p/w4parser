@@ -41,6 +41,7 @@ public class W4Response {
             W4Processor.parse(this, promise);
         } catch (Throwable e) {
             W4Parser.LOG.error(e.getMessage());
+            promise.complete(null);
         }
     }
 }
