@@ -14,6 +14,7 @@ import test.model.*;
 import test.result.TestResult;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -183,7 +184,7 @@ public class ParserTest {
         LOG.info("Remote async parse test passed.");
     }
 
-//    @Test
+    @Test
     public void queue() {
         String url1 = "https://habrahabr.ru/users/";
         String url2 = "https://habrahabr.ru/hubs/";
@@ -195,8 +196,8 @@ public class ParserTest {
                                     })
                                 .run();
         LOG.debug("W4Queue result: {}", result);
-        for (Iterator<HabrahabrModel> it = result.iterator(); it.hasNext();) {
-            HabrahabrModel m = it.next();
+        for (Iterator<List<HabrahabrModel>> it = result.iterator(); it.hasNext();) {
+            HabrahabrModel m = it.next().get(0);
             LOG.info("Res: {}", new Gson().toJson(m));
         }
 

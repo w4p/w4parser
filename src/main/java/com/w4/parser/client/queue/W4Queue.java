@@ -151,7 +151,7 @@ public class W4Queue {
 
     private void runTask(CountDownLatch latch, W4QueueTask task, W4QueueTaskPromise taskPromise) {
         final W4ParsePromise internalPromise = task.getTaskPromise();
-        W4ParsePromise parsePromise = (list) -> {
+        W4ParsePromise<List> parsePromise = (list) -> {
             Integer idx = this.index.get(task.hashCode());
             if (idx != null) {
                 this.result.addResult(idx, list);
