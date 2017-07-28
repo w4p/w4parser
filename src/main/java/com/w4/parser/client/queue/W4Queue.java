@@ -180,6 +180,6 @@ public class W4Queue {
     }
 
     public int getElapsedTaskCount() {
-        return this.requestList.size();
+        return this.requestList.size() + this.activeThreads;
     }
 }
