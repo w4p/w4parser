@@ -38,7 +38,6 @@ public class W4Queue {
     CountDownLatch latch;
 
 
-
     private W4QueueProgressPromise progressPromise;
     private long timeout = 60000 * 60 * 24;
     private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
@@ -178,5 +177,9 @@ public class W4Queue {
 
     public String getUserAgent() {
         return userAgent;
+    }
+
+    public int getElapsedTaskCount() {
+        return this.requestList.size();
     }
 }
