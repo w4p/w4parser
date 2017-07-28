@@ -1,5 +1,6 @@
 package com.w4.parser.client;
 
+import com.w4.parser.W4Parser;
 import com.w4.parser.client.promise.W4ParsePromise;
 import com.w4.parser.client.queue.W4QueueTask;
 import com.w4.parser.processor.W4Processor;
@@ -36,6 +37,10 @@ public class W4Response {
 //    }
 
     public <T> void parse(W4ParsePromise<List<T>> promise) {
-        W4Processor.parse(this, promise);
+        try {
+            W4Processor.parse(this, promise);
+        } catch (Throwable e) {
+            W4Parser.LOG.error(e.getMessage());
+        }
     }
 }

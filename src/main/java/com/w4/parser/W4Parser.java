@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class W4Parser {
-    private static final Logger LOG = LoggerFactory.getLogger(W4Parser.class);
+    public static final Logger LOG = LoggerFactory.getLogger(W4Parser.class);
 
     public static <T extends Object> W4Queue parse(T obj) {
         Class clazz = obj.getClass();
