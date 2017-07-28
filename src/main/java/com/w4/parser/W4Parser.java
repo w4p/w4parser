@@ -3,6 +3,7 @@ package com.w4.parser;
 import com.w4.parser.annotations.W4Fetch;
 import com.w4.parser.client.queue.W4Queue;
 import com.w4.parser.processor.W4Processor;
+import org.eclipse.jetty.http.HttpHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,4 +42,13 @@ public class W4Parser {
     public static W4Queue agent(String userAgent) {
         return new W4Queue().agent(userAgent);
     }
+
+    public static W4Queue header(HttpHeader httpHeader, String value) {
+        return new W4Queue().header(httpHeader, value);
+    }
+
+    public static W4Queue header(String httpHeader, String value) {
+        return new W4Queue().header(httpHeader, value);
+    }
+
 }
