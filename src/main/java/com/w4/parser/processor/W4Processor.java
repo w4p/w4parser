@@ -394,7 +394,7 @@ public class W4Processor {
                     : ((w4JPath.getXpath().html()) ? element.html() : element.text()).trim();
             if (w4JPath.getXpath().postProcess().length > 0) {
                 for (W4RegExp w4RegExp : w4JPath.getXpath().postProcess()) {
-                    data = data.replaceAll(w4RegExp.search(), w4RegExp.replace()).trim();
+                    data = data.replaceAll(w4RegExp.search(), w4RegExp.replace());
                 }
             }
             if (data == null || data.isEmpty()) {

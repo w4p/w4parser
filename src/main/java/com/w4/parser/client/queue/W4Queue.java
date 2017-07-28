@@ -3,6 +3,7 @@ package com.w4.parser.client.queue;
 import com.w4.parser.W4Parser;
 import com.w4.parser.annotations.W4Fetch;
 import com.w4.parser.annotations.W4Parse;
+import com.w4.parser.client.W4ClientHeader;
 import com.w4.parser.client.W4QueueResult;
 import com.w4.parser.client.W4Request;
 import com.w4.parser.client.promise.W4ParsePromise;
@@ -10,13 +11,11 @@ import com.w4.parser.client.promise.W4QueueProgressPromise;
 import com.w4.parser.client.promise.W4QueuePromise;
 import com.w4.parser.client.promise.W4QueueTaskPromise;
 import com.w4.parser.processor.W4Processor;
+import org.eclipse.jetty.http.HttpHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
@@ -33,7 +32,9 @@ public class W4Queue {
 
     private int maxThreads = 10;
     private int activeThreads = 0;
+
     private String userAgent;
+    private List<W4ClientHeader> headers = new ArrayList<>();
 
     CountDownLatch latch;
 
@@ -74,6 +75,16 @@ public class W4Queue {
 
     public W4Queue agent(String ua) {
         this.userAgent = ua;
+        return this;
+    }
+
+    public W4Queue header(String header, String value) {
+        this.headers.add(new W4ClientHeader(header, value));
+        return this;
+    }
+
+    public W4Queue header(HttpHeader header, String value) {
+        this.headers.add(new W4ClientHeader(header, value));
         return this;
     }
 
@@ -181,5 +192,9 @@ public class W4Queue {
 
     public int getElapsedTaskCount() {
         return this.requestList.size() + this.activeThreads;
+    }
+
+    public List<W4ClientHeader> getHeaders() {
+        return headers;
     }
 }

@@ -14,6 +14,7 @@ import org.eclipse.jetty.http.HttpVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -26,6 +27,7 @@ public class W4Request {
 
     private Request request;
     private String url;
+
     private String agent;
 
     private long startedAt;
@@ -97,6 +99,11 @@ public class W4Request {
         if (this.agent != null) {
             this.request.agent(this.agent);
         }
+        if (!this.getQueueTask().getQueue().getHeaders().isEmpty()) {
+            for (W4ClientHeader header : this.getQueueTask().getQueue().getHeaders()) {
+                this.request.header(header.getHeader(), header.getValue());
+            }
+        }
         updateTimeout();
         W4Response response = new W4Response(this.queueTask);
         try {
@@ -116,6 +123,11 @@ public class W4Request {
         this.startedAt = System.currentTimeMillis();
         if (this.agent != null) {
             this.request.agent(this.agent);
+        }
+        if (!this.getQueueTask().getQueue().getHeaders().isEmpty()) {
+            for (W4ClientHeader header : this.getQueueTask().getQueue().getHeaders()) {
+                this.request.header(header.getHeader(), header.getValue());
+            }
         }
         this.queueTask.getQueue().threadMonitor(1);
         LOG.info("Fetch data from: {}", this.request.getURI());
