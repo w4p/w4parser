@@ -23,6 +23,7 @@ public class W4QueueTask<T> {
 
 //    private W4QueueTask parent; //used for interbal @W4Fetch
     private W4ParsePromise<List<T>> taskPromise;
+    private ReturnType returnType = ReturnType.OBJECT;
 
     private Class<T> clazz;
     private W4Parse inheritXpath;

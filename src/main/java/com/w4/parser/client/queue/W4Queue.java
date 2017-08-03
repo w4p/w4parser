@@ -131,16 +131,16 @@ public class W4Queue {
         CompletableFuture.runAsync(() -> w4QueuePromise.complete(run()));
     }
 
-    public <T extends Object> T get() {
-        W4QueueResult<List<T>> result = run();
-        return result.getFirst().get(0);
+    public <T> T get() {
+        W4QueueResult<T> result = run();
+        return result.getFirst().getOne();
     }
 
     public <T extends Object> void get(W4ParsePromise<T> w4ParsePromise) {
         if (this.requestList.size() > 1) {
             LOG.warn("W4Processor queue contains {} items, but used only first", this.requestList.size());
         }
-        run((result -> w4ParsePromise.complete((T) result.getFirst().get(0))));
+        run(result -> w4ParsePromise.complete(((W4TaskResult<T>) result.getFirst()).getOne()));
     }
 
     public void runTaskList(CountDownLatch latch) {
@@ -162,12 +162,13 @@ public class W4Queue {
     private void runTask(CountDownLatch latch, W4QueueTask task, W4QueueTaskPromise taskPromise) {
         final W4ParsePromise internalPromise = task.getTaskPromise();
         W4ParsePromise<List> parsePromise = (list) -> {
+            W4TaskResult w4TaskResult = new W4TaskResult(task, list);
             Integer idx = this.index.get(task.hashCode());
             if (idx != null) {
-                this.result.addResult(idx, list);
+                this.result.addResult(idx, w4TaskResult);
 
                 if (this.progressPromise != null) {
-                    this.progressPromise.onProgress(task, list);
+                    this.progressPromise.onProgress(w4TaskResult);
                 }
                 latch.countDown();
             }

@@ -5,5 +5,5 @@ import com.w4.parser.client.W4QueueResult;
 import java.util.List;
 
 public interface W4QueuePromise {
-    void complete(W4QueueResult<List> result);
+    void complete(W4QueueResult result);
 }

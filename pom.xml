@@ -3,11 +3,36 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    <modelVersion>4.0.0</modelVersion>
     <artifactId>w4p</artifactId>
     <groupId>com.w4</groupId>
     <version>1.0.0</version>
+    <packaging>jar</packaging>
 
-    <modelVersion>4.0.0</modelVersion>
+    <name>W4Parser: HTML to Pojo parser</name>
+    <description>The java HTML/XML to POJO parser with async multithreading support</description>
+    <url>https://github.com/w4p/w4parser</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Vadim Dobroskok</name>
+            <email>autoluxury@gmail.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git@github.com:w4p/w4parser.git</connection>
+        <developerConnection>scm:git:ssh://github.com:w4p/w4parser.gi</developerConnection>
+        <url>http://github.com/simpligility/ossrh-demo/tree/master</url>
+    </scm>
+
 
     <dependencies>
         <dependency>
