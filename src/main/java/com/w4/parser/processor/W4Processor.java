@@ -117,6 +117,9 @@ public class W4Processor {
             if (w4Parse.select().length > 0 && !w4Parse.select()[0].isEmpty()) {
                 W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.select()[0]);
                 elements = element.select(w4JPath.getPath());
+                if (w4Parse.maxCount() != 0 && elements.size() > w4Parse.maxCount()) {
+                    elements = new Elements(elements.subList(0, w4Parse.maxCount()));
+                }
             }
         } else if (task.getInheritXpath() != null) {
             W4Parse w4Parse = task.getInheritXpath();

@@ -136,6 +136,11 @@ public class W4Queue {
         return result.getFirst().getOne();
     }
 
+    public <T> List<T> getList() {
+        W4QueueResult<T> result = run();
+        return result.getFirst().getList();
+    }
+
     public <T extends Object> void get(W4ParsePromise<T> w4ParsePromise) {
         if (this.requestList.size() > 1) {
             LOG.warn("W4Processor queue contains {} items, but used only first", this.requestList.size());
