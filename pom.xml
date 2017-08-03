@@ -30,7 +30,7 @@
     <scm>
         <connection>scm:git:git@github.com:w4p/w4parser.git</connection>
         <developerConnection>scm:git:ssh://github.com:w4p/w4parser.gi</developerConnection>
-        <url>http://github.com/simpligility/ossrh-demo/tree/master</url>
+        <url>https://github.com/w4p/w4parser/tree/master</url>
     </scm>
 
 
