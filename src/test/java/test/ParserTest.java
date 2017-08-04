@@ -27,6 +27,12 @@ public class ParserTest {
     private static final Logger LOG = LoggerFactory.getLogger(ParserTest.class);
 
     @Test
+    public void bbc() {
+        BBC bbc = W4Parser.url("http://www.bbc.com/", BBC.class).debug(true).get();
+        LOG.info(new Gson().toJson(bbc));
+    }
+
+    @Test
     public void parseClass() {
         try {
             Habrahabr habrahabr = W4Parser.agent("W4P user agent").parse(Habrahabr.class).threads(5).get();
