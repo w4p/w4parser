@@ -57,5 +57,29 @@ public class BBC {
         private String fulltext;
     }
 }
+///.......
+BBC bbc = W4Parser.url("http://www.bbc.com/", BBC.class).get();
 ```
 In this case W4Parser parse the top page and find all links with selected rules ``` @W4Parse(select = "//section.module--promo//li[class='media-list__item media-list__item--1']//a.media__link/@href")``` . Then fetch data from this link and parse page with BBCNews class.
+
+#### or we can fecth the list of remote pages
+```java
+public class BBC {
+
+    @W4Fetch(href = @W4Parse(select = "//section.module--promo//a.media__link/@href"),
+            maxFetch = 5)
+    private List<BBCNews> mainNews;
+
+    public static class BBCNews {
+
+        @W4Parse(select = "h1.story-body__h1")
+        private String title;
+
+        @W4Parse(select = "div.story-body__inner")
+        private String fulltext;
+    }
+}
+///.......
+BBC bbc = W4Parser.url("http://www.bbc.com/", BBC.class).get();
+```
+where ```maxFetch``` - option is limit for W4Parser

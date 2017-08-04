@@ -3,10 +3,13 @@ package test.model;
 import com.w4.parser.annotations.W4Fetch;
 import com.w4.parser.annotations.W4Parse;
 
+import java.util.List;
+
 public class BBC {
 
-    @W4Fetch(href = @W4Parse(select = "//section.module--promo//li[class='media-list__item media-list__item--1']//a.media__link/@href"))
-    private BBCNews mainNews;
+    @W4Fetch(href = @W4Parse(select = "//section.module--promo//a.media__link/@href"),
+            maxFetch = 5)
+    private List<BBCNews> mainNews;
 
     public static class BBCNews {
 
