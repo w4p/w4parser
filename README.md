@@ -83,3 +83,23 @@ public class BBC {
 BBC bbc = W4Parser.url("http://www.bbc.com/", BBC.class).get();
 ```
 where ```maxFetch``` - is limit for W4Parser
+
+### Also with W4Parser we can fetch remote & parse remote pages asynchronously
+
+```java
+W4QueueResult result = W4Parser
+                .url("http://www.bbc.com/", BBC.class)
+                .url("http://www.cnn.com/", CNN.class)
+                .run();
+
+```
+
+or fully async implementation with promise
+```java
+W4Parser
+    .url("http://www.bbc.com/", BBC.class)
+    .url("http://www.cnn.com/", CNN.class)
+    .run((result) -> {
+        //Process W4Parser results.
+    });
+```

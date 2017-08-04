@@ -33,6 +33,15 @@ public class ParserTest {
     }
 
     @Test
+    public void bbc() {
+        W4QueueResult result = W4Parser
+                .url("http://www.bbc.com/", BBC.class)
+                .url("http://www.cnn.com/", CNN.class)
+                .run();
+        LOG.info(new Gson().toJson(result));
+    }
+
+    @Test
     public void parseClass() {
         try {
             Habrahabr habrahabr = W4Parser.agent("W4P user agent").parse(Habrahabr.class).threads(5).get();
