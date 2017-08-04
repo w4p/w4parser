@@ -82,4 +82,4 @@ public class BBC {
 ///.......
 BBC bbc = W4Parser.url("http://www.bbc.com/", BBC.class).get();
 ```
-where ```maxFetch``` - option is limit for W4Parser
+where ```maxFetch``` - is limit for W4Parser
