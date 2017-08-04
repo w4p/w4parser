@@ -36,4 +36,26 @@ For supported "select" options in W4Parser annotation please read the jsoup [doc
 W4Parser is an open source project distributed under the liberal MIT license. 
 
 ## Status
-W4Parser now under active developent and has pre-release status.
+W4Parser now under active development and has pre-release status.
+
+## Advanced usage
+
+For example we want to fetch additional data from external url. In this case we can use W4Fetch annotation. For example:
+
+```java
+public class BBC {
+
+    @W4Fetch(href = @W4Parse(select = "//section.module--promo//li[class='media-list__item media-list__item--1']//a.media__link/@href"))
+    private BBCNews mainNews;
+
+    public static class BBCNews {
+
+        @W4Parse(select = "h1.story-body__h1")
+        private String title;
+
+        @W4Parse(select = "div.story-body__inner")
+        private String fulltext;
+    }
+}
+```
+In this case W4Parser parse the top page and find all links with selected rules ``` @W4Parse(select = "//section.module--promo//li[class='media-list__item media-list__item--1']//a.media__link/@href")``` . Then fetch data from this link and parse page with BBCNews class.
