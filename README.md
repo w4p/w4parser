@@ -89,7 +89,7 @@ where ```maxFetch``` - is limit for W4Parser
 public class BBC {
 
     @W4Fetch(url="http://www.bbc.com/news/world-australia-40822310")
-    private List<BBCNews> mainNews;
+    private BBCNews mainNews;
 
     public static class BBCNews {
 
