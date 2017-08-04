@@ -7,7 +7,7 @@ W4Parser - is a Java library for working with real-world HTML data and transform
 Quick steps to parse HTML data to java object.
 
 1) Prepare java object
-
+```java
     public class BBC {
     
         @W4Parse(select = "li[class=media-list__item media-list__item--1]")
@@ -22,11 +22,12 @@ Quick steps to parse HTML data to java object.
             private String desc;
         }
     }
-
+```
 2) Run parser
 
-    BBC bbc = W4Parser.url("http://www.bbc.com/", BBC.class).get();
-
+```java
+BBC bbc = W4Parser.url("http://www.bbc.com/", BBC.class).get();
+```
 Well done! WE already fetched data from BBC website and got BBC class object. It is very simple.
 
 ## Open source
