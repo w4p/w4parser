@@ -84,6 +84,26 @@ BBC bbc = W4Parser.url("http://www.bbc.com/", BBC.class).get();
 ```
 where ```maxFetch``` - is limit for W4Parser
 
+#### W4Parser support for predefined remote url too
+```java
+public class BBC {
+
+    @W4Fetch(url="http://www.bbc.com/news/world-australia-40822310")
+    private List<BBCNews> mainNews;
+
+    public static class BBCNews {
+
+        @W4Parse(select = "h1.story-body__h1")
+        private String title;
+
+        @W4Parse(select = "div.story-body__inner")
+        private String fulltext;
+    }
+}
+///.......
+BBC bbc = W4Parser.url("http://www.bbc.com/", BBC.class).get();
+```
+
 ### Also with W4Parser we can fetch remote & parse remote pages asynchronously
 
 ```java
