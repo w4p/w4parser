@@ -28,7 +28,7 @@ Quick steps to parse HTML data to java object.
 ```java
 BBC bbc = W4Parser.url("http://www.bbc.com/", BBC.class).get();
 ```
-Well done! WE already fetched data from BBC website and got BBC class object. It is very simple.
+Well done! We already fetched data from BBC website and got BBC class object. It is very simple.
 
 ## Open source
 W4Parser is an open source project distributed under the liberal MIT license. 
