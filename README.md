@@ -30,7 +30,7 @@ BBC bbc = W4Parser.url("http://www.bbc.com/", BBC.class).get();
 ```
 Well done! We already fetched data from BBC website and got BBC class object. It is very simple.
 
-For supportred "select" options in W4Parser annotation please read the jsoup [docs](https://jsoup.org/cookbook/extracting-data/selector-syntax).
+For supported "select" options in W4Parser annotation please read the jsoup [docs](https://jsoup.org/cookbook/extracting-data/selector-syntax).
 
 ## Open source
 W4Parser is an open source project distributed under the liberal MIT license. 
