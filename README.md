@@ -110,9 +110,9 @@ public void bbc() {
 W4Parser
     .url("http://www.bbc.com/", BBC.class)
     .url("http://www.cnn.com/", CNN.class)
-    .onProgress((taskResult -> {
+    .onProgress((taskResult) -> {
         //Here we can manipulate with completed task results
-    }))
+    })
     .run((result) -> {
          //Process W4Parser results.
      });
