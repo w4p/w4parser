@@ -106,7 +106,6 @@ W4Parser
 
 and what about progress of our task queue. No problem
 ```java
-public void bbc() {
 W4Parser
     .url("http://www.bbc.com/", BBC.class)
     .url("http://www.cnn.com/", CNN.class)
