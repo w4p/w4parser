@@ -180,12 +180,12 @@ public class W4Processor {
                 field.setAccessible(true);
                 Class<?> genericClass = getGenericClass(field);
                 if (field.isAnnotationPresent(W4Parse.class)) {
-                    LOG.debug("Found annotation in {} on field: {}", clazz.getCanonicalName(), field.getName());
+                    log(task,"Found annotation in {} on field: {}", clazz.getCanonicalName(), field.getName());
                     W4Parse w4Parse = field.getAnnotation(W4Parse.class);
 //                    if (w4Parse.select().length > 0) {
                         for (int i = 0; i < w4Parse.select().length; i++) {
                             W4JPath w4JPath = new W4JPath(w4Parse, w4Parse.select()[i]);
-                            LOG.debug("W4JPath: {}", w4JPath);
+                            log(task,"W4JPath: {}", w4JPath);
                             if (!w4JPath.getPath().startsWith("$")) {
                                 Elements elements;
                                 if (!w4JPath.getPath().isEmpty()) {
@@ -193,7 +193,7 @@ public class W4Processor {
                                 } else {
                                     elements = new Elements(element);
                                 }
-                                LOG.debug("Elements by {} found: {}", w4JPath.getPath(), elements.size());
+                                log(task,"Elements by {}: {}", w4JPath.getPath(), elements.size());
 
                                 if (elements.size() > 0) {
                                     //FOUND DATA
@@ -226,6 +226,8 @@ public class W4Processor {
                                         });
                                     }
                                     break;
+                                } else {
+                                    log(task, "Element with path "+w4JPath.getPath() + " not found");
                                 }
                             } else {
                                 Object val = TypeAdapters.getValue(getInternalData(task, w4JPath), genericClass);
@@ -453,5 +455,12 @@ public class W4Processor {
         @SuppressWarnings("unchecked")
         final Class<E> classE = (Class<E>)tArg;
         return classE;
+    }
+
+    private static void log(W4QueueTask task, String msg, Object... params) {
+        if (task.getQueue().isDebug()) {
+            msg = msg.replaceAll("\\{\\}", "%s");
+            LOG.info(String.format(msg, params));
+        }
     }
 }

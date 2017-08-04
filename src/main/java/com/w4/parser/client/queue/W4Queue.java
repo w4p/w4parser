@@ -32,6 +32,7 @@ public class W4Queue {
 
     private int maxThreads = 10;
     private int activeThreads = 0;
+    private boolean debug = false;
 
     private String userAgent;
     private List<W4ClientHeader> headers = new ArrayList<>();
@@ -86,6 +87,15 @@ public class W4Queue {
     public W4Queue header(HttpHeader header, String value) {
         this.headers.add(new W4ClientHeader(header, value));
         return this;
+    }
+
+    public W4Queue debug(boolean debug) {
+        this.debug = debug;
+        return this;
+    }
+
+    public boolean isDebug() {
+        return debug;
     }
 
     public W4Queue timeout(long timeout, TimeUnit timeUnit) {
