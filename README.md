@@ -36,7 +36,7 @@ For supported "select" options in W4Parser annotation please read the jsoup [doc
 W4Parser is an open source project distributed under the liberal MIT license. 
 
 ## Status
-W4Parser now under active development and has pre-release status.
+W4Parser now under active development and has release status.
 
 ## Advanced usage
 
