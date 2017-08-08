@@ -1,7 +1,7 @@
 package test.model;
 
-import com.w4.parser.annotations.W4Parse;
-import com.w4.parser.annotations.W4RegExp;
+import com.w4p.parser.annotations.W4Parse;
+import com.w4p.parser.annotations.W4RegExp;
 import lombok.Getter;
 import lombok.Setter;
 

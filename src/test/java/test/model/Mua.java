@@ -1,9 +1,9 @@
 package test.model;
 
-import com.w4.parser.annotations.W4Fetch;
-import com.w4.parser.annotations.W4Parse;
-import com.w4.parser.annotations.W4RegExp;
-import com.w4.parser.processor.W4Select;
+import com.w4p.parser.annotations.W4Fetch;
+import com.w4p.parser.annotations.W4Parse;
+import com.w4p.parser.annotations.W4RegExp;
+import com.w4p.parser.processor.W4Select;
 import lombok.Getter;
 
 import java.util.List;

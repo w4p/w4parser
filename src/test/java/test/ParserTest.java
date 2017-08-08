@@ -1,11 +1,10 @@
 package test;
 
 import com.google.gson.Gson;
-import com.w4.parser.W4Parser;
-import com.w4.parser.client.W4QueueResult;
-import com.w4.parser.client.queue.ReturnType;
-import com.w4.parser.client.queue.W4TaskResult;
-import com.w4.parser.processor.W4Processor;
+import com.w4p.parser.W4Parser;
+import com.w4p.parser.client.W4QueueResult;
+import com.w4p.parser.client.queue.W4TaskResult;
+import com.w4p.parser.processor.W4Processor;
 import org.eclipse.jetty.http.HttpHeader;
 import org.junit.Ignore;
 import org.junit.Test;

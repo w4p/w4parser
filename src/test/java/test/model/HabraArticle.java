@@ -1,7 +1,7 @@
 package test.model;
 
-import com.w4.parser.annotations.W4Fetch;
-import com.w4.parser.annotations.W4Parse;
+import com.w4p.parser.annotations.W4Fetch;
+import com.w4p.parser.annotations.W4Parse;
 
 @W4Parse(select = "div.post", maxCount = 3)
 public class HabraArticle {
