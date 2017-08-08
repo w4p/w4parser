@@ -2,11 +2,7 @@
 
 W4Parser - is a Java library for working with real-world HTML data and transform required part of data to simple java object(POJO). It provides a very convenient API for extracting data and based on popular java parser Jsoup.
 
-## Example
-
-Quick steps to parse HTML data to java object.
-
-## Quick install
+##  W4Parser repo
 ```java
 <dependency>
     <groupId>com.github.w4p</groupId>
@@ -14,6 +10,10 @@ Quick steps to parse HTML data to java object.
     <version>1.0.0</version>
 </dependency>
 ```
+
+## Example
+
+Quick steps to parse HTML data to java object.
 
 1) Prepare java object
 ```java
