@@ -6,6 +6,15 @@ W4Parser - is a Java library for working with real-world HTML data and transform
 
 Quick steps to parse HTML data to java object.
 
+## Quick install
+```java
+<dependency>
+    <groupId>com.github.w4p</groupId>
+    <artifactId>w4parser</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
 1) Prepare java object
 ```java
     public class BBC {
