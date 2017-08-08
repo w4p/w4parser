@@ -29,7 +29,7 @@
 
     <scm>
         <connection>scm:git:git@github.com:w4p/w4parser.git</connection>
-        <developerConnection>scm:git:ssh://github.com:w4p/w4parser.gi</developerConnection>
+        <developerConnection>scm:git:ssh://github.com:w4p/w4parser.git</developerConnection>
         <url>https://github.com/w4p/w4parser/tree/master</url>
     </scm>
 
@@ -151,7 +151,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.5</version>
+                <version>1.6</version>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
