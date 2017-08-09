@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>w4parser</artifactId>
     <groupId>com.github.w4p</groupId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
 
     <name>W4Parser: HTML to Pojo parser</name>
