@@ -255,8 +255,11 @@ public class W4Processor {
                                 if (w4Fetch.maxFetch() != 0 && w4Fetch.maxFetch() <= cnt) {
                                     break;
                                 }
-                                futureList.add(processSubTask(url, genericClass, task, field, parentModel));
-                                cnt++;
+                                if (!task.getQueue().isAlreadyFetchedURL(url)) {
+                                    task.getQueue().addFetchedURL(url);
+                                    futureList.add(processSubTask(url, genericClass, task, field, parentModel));
+                                    cnt++;
+                                }
                             }
                         }
 
@@ -278,7 +281,10 @@ public class W4Processor {
                                             getData(link, w4JPath, String.class, null, (url) -> {
                                                 url = normalizeURL(task.getW4Response(), url);
                                                 if (url != null) {
-                                                    futureList.add(processSubTask(url, genericClass, task, field, parentModel));
+                                                    if (!task.getQueue().isAlreadyFetchedURL(url)) {
+                                                        task.getQueue().addFetchedURL(url);
+                                                        futureList.add(processSubTask(url, genericClass, task, field, parentModel));
+                                                    }
                                                 }
                                             });
                                             cnt++;

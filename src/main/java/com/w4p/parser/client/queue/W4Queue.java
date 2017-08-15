@@ -14,10 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class W4Queue {
     private static final Logger LOG = LoggerFactory.getLogger(W4Processor.class);
@@ -25,6 +22,7 @@ public class W4Queue {
     private Queue<W4QueueTask> requestList = new ConcurrentLinkedQueue<>();
     private Map<Integer, Integer> index = new HashMap<>();
     private W4QueueResult result = new W4QueueResult();
+    private Set<String> fetchedUrlSet = new ConcurrentSkipListSet<>();
 
     private W4QueueTask lastTask;
 
@@ -210,5 +208,14 @@ public class W4Queue {
 
     public List<W4ClientHeader> getHeaders() {
         return headers;
+    }
+
+    public boolean isAlreadyFetchedURL(String url) {
+        return this.fetchedUrlSet.contains(url);
+    }
+
+    public W4Queue addFetchedURL(String url) {
+        this.fetchedUrlSet.add(url);
+        return this;
     }
 }
