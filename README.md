@@ -7,7 +7,7 @@ W4Parser - is a Java library for working with real-world HTML data and transform
 <dependency>
     <groupId>com.github.w4p</groupId>
     <artifactId>w4parser</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
