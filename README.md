@@ -148,3 +148,6 @@ W4Parser
 
 ### Used by
 [4weiver](http://www.4weiver.com)
+
+### Author
+Vadim Dobroskok
